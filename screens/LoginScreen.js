@@ -5,7 +5,8 @@ import {
   Text,
   Button,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  Alert
 } from "react-native";
 
 import Card from "../components/Card";
@@ -14,6 +15,32 @@ import Input from "../components/Input";
 
 const LoginScreen = props => {
   const [enteredValue, setEnteredValue] = useState("");
+  const [confirmedEmail, setConfirmedEmail] = useState(false);
+
+  // store entered email
+  const [userEmail, setUserEmail] = useState("");
+
+  const resetInputHandler = () => {
+    setEnteredValue("");
+    setConfirmedEmail(false);
+  };
+
+  const validateInputHandler = () => {
+    if (enteredValue !== "jjg.akers@gmail.com") {
+      Alert.alert(
+        "Invalid Email Address!",
+        "Address must be in the form: email@example.com",
+        [{ text: "Okay", style: "destructive", onPress: resetInputHandler }]
+      );
+      // break out of function if not valid
+      return;
+    }
+    // if email is ok
+    setConfirmedEmail(true);
+    setEnteredValue("");
+    setUserEmail(enteredValue);
+    Keyboard.dismiss();
+  };
 
   const emailInputHandler = inputText => {
     // vlidate entered email
@@ -31,7 +58,7 @@ const LoginScreen = props => {
     >
       <View style={styles.screen}>
         <Text style={styles.title}>Login</Text>
-        
+
         <Card style={styles.inputContainer}>
           <Text>Enter Email</Text>
           <Input
@@ -46,7 +73,11 @@ const LoginScreen = props => {
           />
           <View style={styles.buttonContainer}>
             <View style={styles.button}>
-              <Button title="Login" onPress={() => {}} color={Colors.accent} />
+              <Button
+                title="Login"
+                onPress={validateInputHandler}
+                color={Colors.accent}
+              />
             </View>
             <View style={styles.button}>
               <Button
@@ -78,7 +109,6 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   buttonContainer: {
-
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-between",
@@ -88,7 +118,7 @@ const styles = StyleSheet.create({
     width: 100
   },
   input: {
-    width: '70%',
+    width: "70%",
     textAlign: "center"
   }
 });
