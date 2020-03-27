@@ -1,24 +1,64 @@
-import React from "react";
-import { View, StyleSheet, Text, TextInput, Button } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Button,
+  TouchableWithoutFeedback,
+  Keyboard
+} from "react-native";
+
 import Card from "../components/Card";
+import Colors from "../constants/colors";
+import Input from "../components/Input";
 
 const LoginScreen = props => {
+  const [enteredValue, setEnteredValue] = useState("");
+
+  const emailInputHandler = inputText => {
+    // vlidate entered email
+
+    // use regex in replace function
+    //setEnteredValue(inputText.replace());
+    setEnteredValue(inputText);
+  };
+
   return (
-    <View style={styles.screen}>
-      <Text style={styles.title}>Login</Text>
-      <Card style={styles.inputContainer}>
-        <Text>Enter Email</Text>
-        <TextInput />
-        <View style={styles.buttonContainer}>
-          <View style={styles.button}>
-            <Button title="Login" onPress={() => {}} color="#c717fc" />
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
+      <View style={styles.screen}>
+        <Text style={styles.title}>Login</Text>
+        
+        <Card style={styles.inputContainer}>
+          <Text>Enter Email</Text>
+          <Input
+            style={styles.input}
+            blurOnSubmit
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoCompleteType="email"
+            keyboardType="email-address"
+            onChangeText={emailInputHandler}
+            value={enteredValue}
+          />
+          <View style={styles.buttonContainer}>
+            <View style={styles.button}>
+              <Button title="Login" onPress={() => {}} color={Colors.accent} />
+            </View>
+            <View style={styles.button}>
+              <Button
+                title="Sign Up"
+                onPress={() => {}}
+                color={Colors.primary}
+              />
+            </View>
           </View>
-          <View style={styles.button}>
-            <Button title="Sign Up" onPress={() => {}} color="#f7287b" />
-          </View>
-        </View>
-      </Card>
-    </View>
+        </Card>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -38,14 +78,18 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   buttonContainer: {
+
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-between",
     paddingHorizontal: 15
   },
   button: {
-      width: 100,
-
+    width: 100
+  },
+  input: {
+    width: '70%',
+    textAlign: "center"
   }
 });
 

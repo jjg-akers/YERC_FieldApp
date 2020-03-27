@@ -14,6 +14,7 @@ import GoalInput from "./components/GoalInput";
 import { Camera } from "expo-camera";
 import CameraView from "./components/Camera";
 import Header from "./components/Header";
+import LoginScreen from "./screens/LoginScreen";
 
 export default function App() {
   // set up a container to manage our saved goals
@@ -81,6 +82,8 @@ export default function App() {
   return (
     <View style={styles.screen}>
       <Header title="YERC" />
+
+      <LoginScreen />
       
       <Button title="Add Observation" onPress={addModeHandler} />
       {/* // now onAddGoal will be recieved as a prop inside GoalInput */}
@@ -113,13 +116,14 @@ export default function App() {
       {/* this view will be used to display saved goals */}
       {/* map function takes a function that will execute on every element of an array */}
       {/* {courseGoals.map(goal => () */}
+      
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
+    flex: 1
     //padding: 10
   }
 });
