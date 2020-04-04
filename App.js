@@ -6,7 +6,8 @@ import {
   TextInput,
   Button,
   ScrollView,
-  FlatList
+  FlatList,
+  AsyncStorage
 } from "react-native";
 
 import GoalItem from "./components/GoalItem";
@@ -15,111 +16,156 @@ import { Camera } from "expo-camera";
 import CameraView from "./components/Camera";
 import Header from "./components/Header";
 import LoginScreen from "./screens/LoginScreen";
+import ProfileScreen from "./screens/ProfileScreen";
+
+const getUserID = async () => {
+  //let userID = "";
+  try {
+    let userID = await AsyncStorage.getItem("userID");
+    console.log("userID: ", userID);
+    return userID;
+  } catch (error) {
+    //error retrieving data
+    console.log("Error getting data: ", error.message);
+  }
+  //return userID;
+};
+
+// save email to memory
+const saveUserID = async userID => {
+  console.log("in saveuserID, email: ", userID);
+
+  let userInfo = {
+    id: userID,
+    email: userID,
+    Role: "Admin",
+    Observations: null
+  };
+
+  try {
+    await AsyncStorage.setItem(userID, JSON.stringify(userInfo));
+  } catch (error) {
+    // error retiriving data
+    console.log("error: ", error.message);
+  }
+};
+
+const deleteUserID = async () => {
+  console.log("deleting user");
+  try {
+    await AsyncStorage.removeItem("jjg.akers@gmail.com");
+  } catch (error) {
+    console.log("error deleting: ", error);
+  }
+};
 
 export default function App() {
-  // set up a container to manage our saved goals
-  const [courseGoals, setCourseGoals] = useState([]);
+  
+  
+  console.log("at start of App");
+  // to manage which screen to display, use application logic
 
-  // need to add a state to monitor is we are currently in add obs state
-  const [isAddMode, setIsAddMode] = useState(false);
+  const[loggedIn, setLoggedIn] = useState(false);
 
-  // function goalInputHnadler(enteredText) {
-  //   setEnteredGoal(enteredText);
+  const [userEmail, setUserEmail] = useState();
+
+  const removeUser = () => {
+    setUserEmail(null);
+    setLoggedIn(false);
+    //deleteUserID();
+  };
+
+  // entered email gets sent from login screen to here
+  const showProfileHandler = email => {
+    
+    setUserEmail(email);
+    //saveUserID(email);
+    login();
+  };
+
+  // check user id
+  //console.log(getUserID());
+
+  const [userData, setUserData] = useState("");
+
+  const login = async (email) => {
+    //console.log("in log in func: ", email);
+    //let userID = "";
+    // see if this use has info
+    try {
+      let userInfo = await AsyncStorage.getItem(email);
+      if (userInfo) {
+        //console.log("in if userInfo");
+        let data = JSON.parse(userInfo);
+        //console.log("userinfo: ", data);
+        //console.log("user id: ", data.id);
+        setUserEmail(data.id);
+        setUserData(data);
+        setLoggedIn(true);
+        //content = <ProfileScreen removeEmail={removeUser} />;
+      } else {
+        // user was not in system
+        console.log("nothing in userInfo");
+
+        // save a new user
+        saveUserID(email);
+        setLoggedIn(true);
+      }
+      //return userID;
+    } catch (error) {
+      //error retrieving data
+      console.log("Error getting data: ", error.message);
+    }
+    //return userID;
+  };
+
+  // let userID = getUserID();
+  // if (userID){
+  //   console.log("ID: ", userID);
+  // } else {
+  //   console.log("nothing");
+  // };
+
+  //login();
+  // pass the showprofile handler to the login screen as a prop so that it can be updated
+  //let content = <LoginScreen onConfirmedEmail={showProfileHandler} />;
+
+  let content = <LoginScreen onConfirmedEmail={login} />;
+
+  //check if content is initialized (truish)
+  if (loggedIn) {
+    //console.log("in if userEmail");
+    content = (
+      <ProfileScreen
+        removeEmail={removeUser}
+        userData={userData}
+        //initialize={true}
+      />
+    );
+  } 
+  
+  // else {
+  //   console.log("in else login");
+  //   //login();
   // }
 
-  // observation container
-  const [obsParams, setObservations] = useState([]);
-
-  const addObservationHandler = (obsTitle, obsData) => {
-    setObservations(currentObservations => [
-      ...obsParams,
-      { id: Math.random().toString(), value: { obsTitle, obsData } }
-    ]);
-    setIsAddMode(false);
-  };
-
-  const addGoalHandler = goalTitle => {
-    //want to add our entered goal to a list of goals
-    //console.log(enteredGoal);
-
-    // to use flat list we need a complex item with a key and a value
-    setCourseGoals(currentGoals => [
-      ...courseGoals,
-      { key: Math.random().toString(), value: goalTitle }
-    ]);
-  };
-
-  const removeObsHandler = observationID => {
-    setObservations(currentObservations => {
-      return currentObservations.filter(
-        observation => observation.id !== observationID
-      );
-    });
-  };
-
-  const addModeHandler = () => {
-    setIsAddMode(true);
-  };
-
-  // add function to cancel the add modal
-  const cancelObsAddHandler = () => {
-    setIsAddMode(false);
-  };
-
-  //camer stuff
-  const takePitureHandler = () => {};
-
-  // const [isCameraMode, setIsCameraMode] = useState(false);
-
-  // const addCameraModeHandler = () => {
-  //   setIsCameraMode(true);
-  // };
-
-  // const cancelCameraHandler = () => {
-  //   setIsCameraMode(false);
-  // };
-
   return (
+
     <View style={styles.screen}>
+
       <Header title="YERC" />
 
-      <LoginScreen />
-      
-      <Button title="Add Observation" onPress={addModeHandler} />
-      {/* // now onAddGoal will be recieved as a prop inside GoalInput */}
-      {/* <GoalInput onAddGoal={addGoalHandler} /> */}
-
-      <Button title="Take picture" />
-      {/* //onCancel={cancelCameraHandler}  */}
-
-      <GoalInput
-        visible={isAddMode}
-        onAddGoal={addObservationHandler}
-        onCancel={cancelObsAddHandler}
-      />
+      {content}
 
       {/* renderItem takes a function that will be called on each item of your data 
       and returns a view*/}
-      <FlatList
-        // data={courseGoals}
-        // renderItem={itemData => <GoalItem title={itemData.item.value} />}
-        keyExtractor={(item, index) => item.id}
-        data={obsParams}
-        renderItem={itemData => (
-          <GoalItem
-            id={itemData.item.id}
-            onDelete={removeObsHandler}
-            title={itemData.item.value}
-          />
-        )}
-      />
+
       {/* this view will be used to display saved goals */}
       {/* map function takes a function that will execute on every element of an array */}
       {/* {courseGoals.map(goal => () */}
-      
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   screen: {

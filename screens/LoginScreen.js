@@ -6,7 +6,8 @@ import {
   Button,
   TouchableWithoutFeedback,
   Keyboard,
-  Alert
+  Alert,
+  AsyncStorage
 } from "react-native";
 
 import Card from "../components/Card";
@@ -18,7 +19,7 @@ const LoginScreen = props => {
   const [confirmedEmail, setConfirmedEmail] = useState(false);
 
   // store entered email
-  const [userEmail, setUserEmail] = useState("");
+  const [email, setEmail] = useState("");
 
   const resetInputHandler = () => {
     setEnteredValue("");
@@ -38,8 +39,32 @@ const LoginScreen = props => {
     // if email is ok
     setConfirmedEmail(true);
     setEnteredValue("");
-    setUserEmail(enteredValue);
+    setEmail(enteredValue);
     Keyboard.dismiss();
+    //props.onConfirmedEmail(email);
+    props.onConfirmedEmail(enteredValue);
+    //props.onConfirmedEmail(email);
+
+    // save username to memory:
+    //saveUserID(enteredValue);
+
+    // AsyncStorage.setItem('dateTime', JSON.stringify(obsToStore), () => {
+    //   //AsyncStorage.mergeItem('UID123', JSON.stringify(UID123_delta), () => {
+    //     AsyncStorage.getItem('dateTime', (err, result) => {
+    //       console.log(result);
+    //     });
+    // });
+    
+  // };
+
+  // const saveUserID = async userID => {
+  //   console.log("in saveuserID");
+  //   try {
+  //     await AsyncStorage.setItem('userID', JSON.stringify(userID));
+  //   } catch (erro) {
+  //     // error retiriving data
+  //     console.log("error: ", error.message);
+  //   }
   };
 
   const emailInputHandler = inputText => {
@@ -49,6 +74,8 @@ const LoginScreen = props => {
     //setEnteredValue(inputText.replace());
     setEnteredValue(inputText);
   };
+
+
 
   return (
     <TouchableWithoutFeedback
