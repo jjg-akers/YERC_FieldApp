@@ -18,8 +18,13 @@ import Card from "../components/Card";
 import Colors from "../constants/colors";
 import Input from "../components/Input";
 import ListItem, { Separator } from "../components/ListItem";
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions';
 
 const ProfileScreen = props => {
+
+  const [currentLocation, setLocation] = useState(null);
+
   // set up a container to manage our saved goals
   const [courseGoals, setCourseGoals] = useState([]);
 
@@ -50,9 +55,9 @@ const ProfileScreen = props => {
       let obs = obsParams.filter(observation => {
         return observation.id === values.id;
       });
-      console.log("obs before id: ", obs[0]);
+      //console.log("obs before id: ", obs[0]);
       obs[0].obsData = values;
-      console.log("obs after id: ", obs[0]);
+      //console.log("obs after id: ", obs[0]);
 
       setIsEditMode(false);
       setIsAddMode(false);
@@ -162,6 +167,9 @@ const ProfileScreen = props => {
 
   const [isEditMode, setIsEditMode] = useState(false);
   // Handler to open an already saved observation
+  
+  
+  // --------- OLD Edit Mode ----------
   const openEditObsHandler = observationID => {
     setIsAddMode(true);
     setIsEditMode(true);
@@ -174,8 +182,13 @@ const ProfileScreen = props => {
     // send data to autofill fields
   };
 
+  // ----------- NEW Edit Mode ---------
+
+
+
   const addModeHandler = () => {
     setIsAddMode(true);
+    //getLocation();
   };
 
   const cancelEditMode = () => {
@@ -311,14 +324,7 @@ const ProfileScreen = props => {
       {/* <GoalInput onAddGoal={addGoalHandler} /> */}
 
       <Button title="Log out" onPress={logoutHandler} />
-      {/* //onCancel={cancelCameraHandler}  */}
 
-      {/* <GoalInput
-        visible={isEditMode}
-        onCancel={cancelEditMode}
-        data={editData[0]}
-
-        /> */}
 
       <GoalInput
         visible={isAddMode}
@@ -326,24 +332,10 @@ const ProfileScreen = props => {
         onCancel={cancelObsAddHandler}
         data={editData}
         onSubmit={submitObsHandler}
+        //location={currentLocation}
         //onDelete={removeObsHandler}
       />
 
-      {/* _______________------- */}
-      {/* <FlatList
-        data={quotes}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <ListItem
-            {...item}
-            onSwipeFromLeft={() => alert("swiped from left!")}
-            onRightPress={() => alert("pressed right!")}
-          />
-        )}
-        ItemSeparatorComponent={() => <Separator />}
-      /> */}
-
-      {/* ------------------------- */}
 
       {/* renderItem takes a function that will be called on each item of your data 
     and returns a view*/}
@@ -373,8 +365,8 @@ const ProfileScreen = props => {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1
-    //padding: 10
+    flex: 1,
+    padding: 10
   }
 });
 
