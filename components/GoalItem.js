@@ -87,6 +87,8 @@ const RightActions = ({ progress, dragX, onPressDelete, id }) => {
 };
 
 const GoalItem = (props) => {
+
+  console.log('in goalitem');
   //const date = new Date().toString;
   return (
     // .bind sets a default argument
@@ -117,9 +119,7 @@ const GoalItem = (props) => {
       <View style={styles.listItem}>
         <Text>Title: {props.title.title}</Text>
         <Text>Date: {props.title.time}</Text>
-        {/* <Text>Data: {props.title.temp}</Text> */}
       </View>
-      {/* </TouchableOpacity> */}
     </Swipeable>
   );
 };

@@ -7,21 +7,63 @@ import {
   Button,
   ScrollView,
   FlatList,
-  AsyncStorage
+  AsyncStorage,
+  Alert,
+  TouchableOpacity,
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
+
+import { Ionicons } from "@expo/vector-icons";
 
 import GoalItem from "../components/GoalItem";
 import GoalInput from "../components/GoalInput";
+
 import { Camera } from "expo-camera";
 import CameraView from "../components/Camera";
 import Card from "../components/Card";
 import Colors from "../constants/colors";
 import Input from "../components/Input";
+import Settings from "../components/Settings";
 import ListItem, { Separator } from "../components/ListItem";
-import * as Location from 'expo-location';
-import * as Permissions from 'expo-permissions';
+import * as Location from "expo-location";
+import * as Permissions from "expo-permissions";
 
-const ProfileScreen = props => {
+const ProfileScreen = (props) => {
+  const deleteUserID = async () => {
+    console.log("deleting user");
+    try {
+      await AsyncStorage.removeItem("jjg.akers@gmail.com");
+    } catch (error) {
+      console.log("error deleting: ", error);
+    }
+  };
+
+  const { route, navigation } = props;
+  //console.log('route: ', route);
+  const { user } = route.params;
+
+  const [isSettingsMode, setIsSettingsMode] = useState(false);
+
+  navigation.setOptions({
+    headerRight: () => (
+      <TouchableOpacity onPress={settingsHandler}>
+        <Ionicons
+          size={30}
+          color="#fff"
+          name="md-settings"
+          style={{ paddingRight: 30 }}
+        />
+        {/* <Button
+      onPress={() => alert("Button Pressed")}
+      title="Info"
+      color="#fff"
+    /> */}
+      </TouchableOpacity>
+    ),
+  });
+
+  //console.log('at profile screen: ', user);
 
   const [currentLocation, setLocation] = useState(null);
 
@@ -38,6 +80,12 @@ const ProfileScreen = props => {
 
   const [obsParams, setObservations] = useState([]);
 
+  const settingsHandler = () => {
+    setIsSettingsMode(true);
+  };
+
+  //console.log('obs params: ', obsParams);
+
   // const updateObsHandler = observationID => {
 
   //   // update an observation
@@ -49,10 +97,10 @@ const ProfileScreen = props => {
   //   });
   // };
 
-  const addObservationHandler = async values => {
+  const addObservationHandler = async (values) => {
     if (values.id) {
       //console.log(obsParams[id])
-      let obs = obsParams.filter(observation => {
+      let obs = obsParams.filter((observation) => {
         return observation.id === values.id;
       });
       //console.log("obs before id: ", obs[0]);
@@ -63,12 +111,13 @@ const ProfileScreen = props => {
       setIsAddMode(false);
       //.obsData = values;
     } else {
+      console.log("in else: ");
       //console.log("valuse: ", values);
 
       //var newObsID = Math.random().toString();
-      setObservations(currentObservation => [
+      setObservations((currentObservation) => [
         ...obsParams,
-        { id: Math.random().toString(), obsData: values }
+        { id: Math.random().toString(), obsData: values },
       ]);
 
       //console.log("current obsParams: ", obsParams);
@@ -82,25 +131,30 @@ const ProfileScreen = props => {
   const updateSavedObs = async () => {
     console.log("in updateSavedObs");
 
-    console.log("obs params in update: ", obsParams);
+    //console.log("obs params in update: ", obsParams);
     let obsToStore = {
-      Observations: obsParams
+      Observations: obsParams,
     };
+
+    console.log("user id in update saved obs", user.id);
     //AsyncStorage.setItem('dateTime', JSON.stringify(obsToStore), () => {
     //console.log(props.userData.email);
 
     // let userInfo = await AsyncStorage.getItem(props.userData.id);
     //console.log("user info: ", userInfo);
-
-    await AsyncStorage.mergeItem(
-      props.userData.id,
-      JSON.stringify(obsToStore),
-      async () => {
-        await AsyncStorage.getItem(props.userData.id, (err, result) => {
-          console.log("result of merge: ", result);
-        });
-      }
-    );
+    try {
+      await AsyncStorage.mergeItem(
+        user.id,
+        JSON.stringify(obsToStore),
+        async () => {
+          await AsyncStorage.getItem(user.id, (err, result) => {
+            console.log("result of merge: ", result);
+          });
+        }
+      );
+    } catch (error) {
+      console.log("error merging: ", error);
+    }
   };
 
   // check if new obs
@@ -113,18 +167,18 @@ const ProfileScreen = props => {
 
   //updateSavedObs();
 
-  const addGoalHandler = goalTitle => {
+  const addGoalHandler = (goalTitle) => {
     //want to add our entered goal to a list of goals
     //console.log(enteredGoal);
 
     // to use flat list we need a complex item with a key and a value
-    setCourseGoals(currentGoals => [
+    setCourseGoals((currentGoals) => [
       ...courseGoals,
-      { key: Math.random().toString(), value: goalTitle }
+      { key: Math.random().toString(), value: goalTitle },
     ]);
   };
 
-  const removeObsHandler = observationID => {
+  const removeObsHandler = (observationID) => {
     //console.log('obs id: ', observationID);
     // remove the observation from memory
     // const deleteUserID = async () => {
@@ -135,21 +189,23 @@ const ProfileScreen = props => {
     //     console.log("error deleting: ", error);
     //   }
     // };
-    console.log("obs params before fileter: ", obsParams);
+    ///console.log("obs params before fileter: ", obsParams);
     // remove from flat list
-    let filteredObs = obsParams.filter(function(value, index, arr) {
+    let filteredObs = obsParams.filter(function (value, index, arr) {
       return value.id !== observationID;
     });
 
-    console.log("filtered obse: ", filteredObs);
+    //console.log("filtered obse: ", filteredObs);
     // async () => {
 
     // setObservations('');
     // }
-    console.log("obsparams after setting empti: ", obsParams);
+    //console.log("obsparams after setting empti: ", obsParams);
 
     // useEffect(() => {
     setObservations(filteredObs);
+
+    console.log("in setObservations");
     // });
     // setObservations(currentObservations => {
     //   return currentObservations.filter(
@@ -157,7 +213,7 @@ const ProfileScreen = props => {
     //   );
     // });
 
-    console.log("obsparams after removing: ", obsParams);
+    //console.log("obsparams after removing: ", obsParams);
 
     // update saved obs
     updateSavedObs();
@@ -167,24 +223,80 @@ const ProfileScreen = props => {
 
   const [isEditMode, setIsEditMode] = useState(false);
   // Handler to open an already saved observation
-  
-  
-  // --------- OLD Edit Mode ----------
-  const openEditObsHandler = observationID => {
-    setIsAddMode(true);
-    setIsEditMode(true);
-    let data = obsParams.filter(observation => {
+
+  const openEditObsHandler = (observationID) => {
+    // navigate to edit screen
+    //alert("opening editscreen");
+    let currentData = obsParams.filter((observation) => {
       return observation.id === observationID;
     });
-    console.log("data: ", data);
 
-    setEditData(data[0]);
-    // send data to autofill fields
+    //console.log('currentData: ', currentData[0]);
+
+    navigation.navigate("EditScreen", {
+      obsInfo: currentData[0],
+      userID: user.id,
+      allObs: obsParams,
+    });
   };
 
-  // ----------- NEW Edit Mode ---------
+  const [isLoading, setLoading] = useState(true);
+  const [respObj, setRespObj] = useState("");
 
+  const putRequest = async () => {
+    try {
+      let response = await fetch(
+        "http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
+        {
+          method: "PUT",
+          // headers: {
+          //   Accept: 'application/json',
+          //   'Content-Type': 'application/json',
+          // },
+          //{"siteid": "big1", "deviceid": "20449344", "t": "2019-11-22 07:24:37", "dobtype": "WaterQuantity", "name": "depth", "value": -1.2336, "status": "new", "observer": "csvfile"}
+          body: JSON.stringify({
+            siteid: "yerc",
+            t: "2020-03-22 07:24:37",
+            dobtype: "Test",
+            name: "example1",
+            value: -1.2336,
+            status: "new",
+            observer: "test from app",
+          }),
+        }
+      )
+        .then((response) => response.json())
+        .then((responseJson) => {
+          setLoading(false);
+          setRespObj(responseJson);
+        });
 
+      // let responseJson = await response.json();
+      // return responseJson.msg;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const submitEditObsHandler = () => {
+    console.log("in submitEditObs Handler");
+    // call submit function
+    putRequest();
+
+    if (!isLoading) {
+      console.log(respObj);
+    }
+  };
+
+  // const submitObservationHanler = () => {
+  //   putRequest();
+
+  //   //props.onSubmit();
+
+  //   //reset flags
+  //   setLocationIsSet(false);
+  //   //setIsEditMode(false);
+  // };
 
   const addModeHandler = () => {
     setIsAddMode(true);
@@ -249,93 +361,106 @@ const ProfileScreen = props => {
   if (isInitialize) {
     console.log("in initialize");
 
-    if (props.userData.Observations !== null) {
+    if (user.Observations) {
+      console.log("in user observations");
       //console.log('something in obs: ', props.userData.Observations);
 
       // need to get observations into obsparams
       //console.log('Observations: ', props.userData.Observations);
+      //console.log('user observations: ', user.Observations);
 
-      setObservations(props.userData.Observations);
-      //console.log('params after: ', obsParams);
-      // setObservations( () => [
-      //   ...obsParams, props.userData.Observations.values()
-      // ]);
-
-      // add old obs to page
-      // props.userData.Observations.forEach(element => {
-      //   console.log("elemetn: ", element);
-      //   setObservations(() => [
-      //     ...obsParams,
-      //     { id: Math.random().toString(), obsData: element.obsData }
-      //   ]);
-      // });
+      setObservations(user.Observations);
     } else {
       console.log("nothing in obs");
     }
+
+    // if (user.Observations !== null) {
+
+    //   console.log('in user observations');
+    //   //console.log('something in obs: ', props.userData.Observations);
+
+    //   // need to get observations into obsparams
+    //   //console.log('Observations: ', props.userData.Observations);
+    //   console.log('user observations: ', user.Observations);
+
+    //   setObservations(user.Observations);
+    //   //console.log('params after: ', obsParams);
+    //   // setObservations( () => [
+    //   //   ...obsParams, props.userData.Observations.values()
+    //   // ]);
+
+    //   // add old obs to page
+    //   // props.userData.Observations.forEach(element => {
+    //   //   console.log("elemetn: ", element);
+    //   //   setObservations(() => [
+    //   //     ...obsParams,
+    //   //     { id: Math.random().toString(), obsData: element.obsData }
+    //   //   ]);
+    //   // });
+    // } else {
+    //   console.log("nothing in obs");
+    // }
     setInitialize(false);
     // set obs from memory
   }
 
+  const setSettingsLow = () => {
+    setIsSettingsMode(false);
+  };
 
   // submit to db
-  const submitObsHandler = () => {
-
-    console.log('in submit handler')
-    //props.onAddGoal(enteredGoal, enteredOther);
-    // testing post request
-    // async function getMoviesFromApi() {
-    try {
-      const formData = new FormData();
-      formData.append("email", "jjg.akers@gmail.com");
-      formData.append("latitude", "99999");
-      formData.append("longitude", "111111");
-      formData.append("watertemp", "123");
-      formData.append("comments", "From react-native app");
-
-      let response = fetch(
-        //"http://rivernet-mobile.azurewebsites.net/observation",
-        {
-          method: "POST",
-          body: formData
-          //   headers: {
-          //     Accept: "application/json",
-          //     "Content-Type": "applicatoin/json"
-          //   },
-          //   body: JSON.stringify({
-          //     email: "jjg.akers@gmail.com",
-          //     latitude: "99999",
-          //     longitue: "111111",
-          //     watertemp: "123"
-          //   })
-        }
-      );
-
-      //let responseJson = response.json();
-      console.log(response);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <View style={styles.screen}>
-      <Button title="Add Observation" onPress={addModeHandler}  />
-      {/* // now onAddGoal will be recieved as a prop inside GoalInput */}
-      {/* <GoalInput onAddGoal={addGoalHandler} /> */}
+      {/* <Settings visible={isSettingsMode} /> */}
 
-      <Button title="Log out" onPress={logoutHandler} />
+      <Modal
+        visible={isSettingsMode}
+        animationType="slide"
+        transparent={true}
+        //onRequestClose={this.closeModal}
+      >
+        <View style={styles.settingsScreen}>
+          <View style={styles.settingsContainer}>
+            <TouchableOpacity onPress={setSettingsLow}>
+              <Ionicons
+                size={30}
+                color="red"
+                name="md-close-circle"
+                style={{ paddingRight: 30 }}
+              />
+              {/* <Button
+      onPress={() => alert("Button Pressed")}
+      title="Info"
+      color="#fff"
+    /> */}
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View style={styles.logout}>
+                <Button title="Log out" />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
+      <TouchableOpacity style={styles.btns}>
+        <View>
+          <Button title="Add Observation" onPress={addModeHandler} />
+          {/* // now onAddGoal will be recieved as a prop inside GoalInput */}
+          {/* <GoalInput onAddGoal={addGoalHandler} /> */}
+        </View>
+      </TouchableOpacity>
 
       <GoalInput
         visible={isAddMode}
         onAddGoal={addObservationHandler}
         onCancel={cancelObsAddHandler}
         data={editData}
-        onSubmit={submitObsHandler}
+        //onSubmit={submitObsHandler}
         //location={currentLocation}
         //onDelete={removeObsHandler}
       />
-
 
       {/* renderItem takes a function that will be called on each item of your data 
     and returns a view*/}
@@ -344,14 +469,13 @@ const ProfileScreen = props => {
         // renderItem={itemData => <GoalItem title={itemData.item.value} />}
         keyExtractor={(item, index) => item.id}
         data={obsParams}
-        renderItem={itemData => (
+        renderItem={(itemData) => (
           <GoalItem
             onSwipeFromLeft={openEditObsHandler}
-            onSwipeFromLeftSubmit={() => alert("submmit!")}
+            onSwipeFromLeftSubmit={submitEditObsHandler}
             //onRightPress={() => alert("pressed Delete!")}
             onRightPress={removeObsHandler}
             id={itemData.item.id}
-            //onOpen={openEditObsHandler}
             title={itemData.item.obsData}
           />
         )}
@@ -366,13 +490,56 @@ const ProfileScreen = props => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    padding: 10
-  }
+    padding: 10,
+    alignItems: "center",
+  },
+  btns: {
+    marginVertical: 10,
+    width: "80%",
+    borderColor: "black",
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  settingsScreen: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+    flex: 1,
+    margin: 0,
+    padding: 0,
+  },
+  settingsContainer: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+    flex: 1, // lets you conrol how much space the container will take up
+    // flexDirection: "row",
+    //justifyContent: "center",
+    alignItems: "center",
+    //borderColor: "black",
+    //borderWidth: 1,
+    //marginTop: 80,
+    marginHorizontal: 40,
+    marginVertical: 200,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowRadius: 6,
+    shadowOpacity: 0.26,
+    backgroundColor: "white",
+    elevation: 5,
+    padding: 10,
+    borderRadius: 20,
+  },
+  logout: {
+    borderColor: "black",
+    borderWidth: 1,
+    borderRadius: 10,
+    width: "60%",
+  },
 });
 
 const quotes = [
   { id: "0", text: "It’s just a flesh wound." },
-  { id: "1", text: "That is my least vulnerable spot." }
+  { id: "1", text: "That is my least vulnerable spot." },
 ];
 
 export default ProfileScreen;

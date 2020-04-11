@@ -17,13 +17,14 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 90,
         paddingTop: 36,
-        backgroundColor: Colors.primary,
+        backgroundColor: '#24753a',
         alignItems: 'center',
         justifyContent: 'center',
+        color: 'blue',
     },
     headerTitle: {
         color: 'black',
-        fontSize: 18,
+        fontSize: 24,
 
     }
 });

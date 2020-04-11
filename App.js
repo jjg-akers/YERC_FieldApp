@@ -10,6 +10,8 @@ import {
   AsyncStorage
 } from "react-native";
 
+import MainStackNavigator from './navigation/MainStackNavigator';
+
 import GoalItem from "./components/GoalItem";
 import GoalInput from "./components/GoalInput";
 import { Camera } from "expo-camera";
@@ -62,7 +64,7 @@ const deleteUserID = async () => {
 export default function App() {
   
   
-  console.log("at start of App");
+  //console.log("at start of App");
   // to manage which screen to display, use application logic
 
   const[loggedIn, setLoggedIn] = useState(false);
@@ -150,20 +152,25 @@ export default function App() {
   // }
 
   return (
+    <MainStackNavigator />
 
-    <View style={styles.screen}>
 
-      <Header title="YERC" />
+    //------------- old version
+  //   <View style={styles.screen}>
 
-      {content}
+  //     <Header title="YERC" />
 
-      {/* renderItem takes a function that will be called on each item of your data 
-      and returns a view*/}
+  //     {content}
 
-      {/* this view will be used to display saved goals */}
-      {/* map function takes a function that will execute on every element of an array */}
-      {/* {courseGoals.map(goal => () */}
-    </View>
+  //     {/* renderItem takes a function that will be called on each item of your data 
+  //     and returns a view*/}
+
+  //     {/* this view will be used to display saved goals */}
+  //     {/* map function takes a function that will execute on every element of an array */}
+  //     {/* {courseGoals.map(goal => () */}
+  //   </View>
+  // );
+  // ------------- END Old Ver
   );
 }
 
