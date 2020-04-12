@@ -16,6 +16,7 @@ import Card from "../components/Card";
 import Colors from "../constants/colors";
 import Input from "../components/Input";
 import Header from "../components/Header";
+import { CommonActions } from "@react-navigation/native";
 
 const LoginScreen = (props) => {
   const { navigation } = props;
@@ -30,7 +31,7 @@ const LoginScreen = (props) => {
     //console.log("in saveuserID, email: ", userID);
     try {
       await AsyncStorage.setItem(userInfo.id, JSON.stringify(userInfo));
-      console.log("after awaite: ", userInfo.id);
+      //console.log("after awaite: ", userInfo.id);
     } catch (error) {
       // error retiriving data
       console.log("error: ", error.message);
@@ -166,7 +167,19 @@ const LoginScreen = (props) => {
   if (loggedIn) {
     ///console.log("in if loggenin: ", userData.id);
     if (userData.id) {
-      navigation.navigate("Profile", { user: userData });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Profile', params: {user: userData}}],
+        //params: {user: userData},
+      });
+
+      // navigation.dispatch(
+      //   CommonActions.reset({
+      //     index: 0,
+      //     actions: [NavigationAction.navigate("Profile", { user: userData })]
+      //   })
+      // );
+   //navigation.navigate("Profile", { user: userData });
     }
   }
 

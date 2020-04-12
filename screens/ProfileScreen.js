@@ -28,16 +28,9 @@ import Settings from "../components/Settings";
 import ListItem, { Separator } from "../components/ListItem";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
+import DrawerNavigator from "../navigation/DrawerNavigator";
 
 const ProfileScreen = (props) => {
-  const deleteUserID = async () => {
-    console.log("deleting user");
-    try {
-      await AsyncStorage.removeItem("jjg.akers@gmail.com");
-    } catch (error) {
-      console.log("error deleting: ", error);
-    }
-  };
 
   const { route, navigation } = props;
   //console.log('route: ', route);
@@ -62,6 +55,28 @@ const ProfileScreen = (props) => {
       </TouchableOpacity>
     ),
   });
+
+   // Function to completely remove user and data from phone (essetially reset app)
+   const deleteUserID = async (useID) => {
+    console.log("deleting user");
+    try {
+      await AsyncStorage.removeItem("jjg.akers@gmail.com");
+    } catch (error) {
+      console.log("error deleting: ", error);
+    }
+
+    // after removing data from phone storage, navigate back to login screen
+    // navigation.navigate("Login", {
+    //   // obsInfo: currentData[0],
+    //   // userID: user.id,
+    //   // allObs: obsParams,
+    // });
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login'}],
+    });
+    
+  };
 
   //console.log('at profile screen: ', user);
 
@@ -373,33 +388,6 @@ const ProfileScreen = (props) => {
     } else {
       console.log("nothing in obs");
     }
-
-    // if (user.Observations !== null) {
-
-    //   console.log('in user observations');
-    //   //console.log('something in obs: ', props.userData.Observations);
-
-    //   // need to get observations into obsparams
-    //   //console.log('Observations: ', props.userData.Observations);
-    //   console.log('user observations: ', user.Observations);
-
-    //   setObservations(user.Observations);
-    //   //console.log('params after: ', obsParams);
-    //   // setObservations( () => [
-    //   //   ...obsParams, props.userData.Observations.values()
-    //   // ]);
-
-    //   // add old obs to page
-    //   // props.userData.Observations.forEach(element => {
-    //   //   console.log("elemetn: ", element);
-    //   //   setObservations(() => [
-    //   //     ...obsParams,
-    //   //     { id: Math.random().toString(), obsData: element.obsData }
-    //   //   ]);
-    //   // });
-    // } else {
-    //   console.log("nothing in obs");
-    // }
     setInitialize(false);
     // set obs from memory
   }
@@ -437,7 +425,7 @@ const ProfileScreen = (props) => {
             </TouchableOpacity>
             <TouchableOpacity>
               <View style={styles.logout}>
-                <Button title="Log out" />
+                <Button title="Log out" onPress={deleteUserID}/>
               </View>
             </TouchableOpacity>
           </View>
