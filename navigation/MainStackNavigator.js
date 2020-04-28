@@ -8,6 +8,7 @@ import Login from "../screens/LoginScreen";
 import Profile from "../screens/ProfileScreen";
 import EditScreen from "../screens/EditScreen";
 import { Button } from "react-native";
+import Colors from "../constants/colors";
 
 const Stack = createStackNavigator();
 
@@ -18,7 +19,7 @@ function MainStackNavigator() {
         initialRouteName="Login"
         screenOptions={{
           headerStyle: {
-            backgroundColor: "#24753a",
+            backgroundColor: Colors.header,
           },
           headerTitleStyle: {
             fontWeight: "bold",

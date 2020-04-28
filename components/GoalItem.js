@@ -32,11 +32,7 @@ const LeftActions = ({ progress, dragX, onPressEdit, onPressSubmit, id }) => {
           <Animated.Text
             style={[styles.actionText, { transform: [{ scale }] }]}
           >
-            <Ionicons
-              size={40}
-              color="black"
-              name="md-create"
-            />
+            <Ionicons size={40} color="black" name="md-create" />
           </Animated.Text>
         </View>
       </TouchableOpacity>
@@ -87,8 +83,7 @@ const RightActions = ({ progress, dragX, onPressDelete, id }) => {
 };
 
 const GoalItem = (props) => {
-
-  console.log('in goalitem');
+  console.log("in goalitem");
   //const date = new Date().toString;
   return (
     // .bind sets a default argument
@@ -117,8 +112,12 @@ const GoalItem = (props) => {
       )}
     >
       <View style={styles.listItem}>
-        <Text>Title: {props.title.title}</Text>
-        <Text>Date: {props.title.time}</Text>
+        <View style={styles.listItemText}>
+          <Text>Site: {props.title.title}</Text>
+        </View>
+        <View style={styles.listItemText}>
+          <Text>Date: {props.title.time}</Text>
+        </View>
       </View>
     </Swipeable>
   );
@@ -126,41 +125,43 @@ const GoalItem = (props) => {
 
 const styles = StyleSheet.create({
   listItem: {
-    paddingHorizontal: 10,
-    paddingVertical: 20,
+    flex: 1,
+    //paddingHorizontal: 70,
+    paddingVertical: 10,
     marginVertical: 10,
     backgroundColor: "#ccc",
     borderColor: "black",
     borderWidth: 1,
+    // alignItems: 'flex-start',
+    // justifyContent: "flex-start",
+    //width: '100%',
+  },
+  listItemText: {
+    minWidth: '80%',
+    // padding: 10,
+    marginVertical: 3,
+    paddingHorizontal: 10,
+    // alignItems: 'flex-start',
+    // justifyContent: "flex-start",
+    // borderColor: "black",
+    // borderWidth: 1,
   },
   leftActionContainer: {
     //flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     //backgroundColor: "#388e3c",
     flexDirection: "row",
     marginVertical: 10,
-    width: 200,
+    width: 160,
     justifyContent: "center",
     //alignItems: "center",
   },
   leftAction: {
-    //backgroundColor: "#388e3c",
-    justifyContent: "center",
-    alignItems: "center",
     flex: 1,
-    width: 75,
-    //height: 75,
-    //borderColor: "black",
-    //borderWidth: 1,
-    //height: 30,
-    //margin: 5,
-    //padding: 10,
-    //borderRadius: 10,
-    //backgroundColor: "white",
   },
   border: {
-    borderRightColor: 'grey',
-    borderRightWidth: .5,
+    borderRightColor: "grey",
+    borderRightWidth: 0.5,
   },
   rightAction: {
     backgroundColor: "white",
@@ -168,23 +169,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flex: 1,
     alignItems: "center",
-    //marginVertical: 10,
+    marginVertical: 10,
   },
-  // container: {
-  //   backgroundColor: '#fff',
-  //   paddingHorizontal: 10,
-  //   paddingVertical: 20,
-  // },
-  // text: {
-  //   color: '#4a4a4a',
-  //   fontSize: 15,
-  // },
-  // separator: {
-  //   flex: 1,
-  //   height: 1,
-  //   backgroundColor: '#e4e4e4',
-  //   marginLeft: 10,
-  // },
 
   actionText: {
     color: "#fff",

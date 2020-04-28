@@ -1,5 +1,5 @@
 export default {
-    primary: '#f7287b',
+    primary: 'red',
     accent: 'blue',
-    header: '#24753a',
+    header: '#468f6c',
 };

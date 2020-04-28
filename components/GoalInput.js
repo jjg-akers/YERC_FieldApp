@@ -9,11 +9,33 @@ import {
   Image,
   TouchableWithoutFeedback,
   Keyboard,
+  Picker,
+  KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import CameraView from "./Camera";
 import Constants from "expo-constants";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
+
+const getTimeStamp = () => {
+  let d = new Date();
+  let Str =
+    d.getFullYear() +
+    "-" +
+    ("00" + (d.getMonth() + 1)).slice(-2) +
+    "-" +
+    ("00" + d.getDate()).slice(-2) +
+    " " +
+    ("00" + d.getHours()).slice(-2) +
+    ":" +
+    ("00" + d.getMinutes()).slice(-2) +
+    ":" +
+    ("00" + d.getSeconds()).slice(-2);
+
+  console.log("date: ", Str);
+  return Str;
+};
 
 const siteInfo = [
   {
@@ -201,6 +223,7 @@ const siteInfo = [
 ];
 
 const GoalInput = (props) => {
+  console.log("start of goal input");
   //const [isEditMode, setIsEditMode] = useState(false);
 
   let defaultVal = "";
@@ -208,7 +231,7 @@ const GoalInput = (props) => {
   //const [editValue, setEditValue] = useState('')
   if (props.data) {
     //setIsEditMode(true);
-    console.log("edit data in goalinput: ", props.data.obsData.title);
+    //console.log("edit data in goalinput: ", props.data.obsData.title);
     defaultVal = props.data.obsData.title;
     defaultTemp = props.data.obsData.temp;
     //setEditValue(props.data.obsData.title);
@@ -226,6 +249,10 @@ const GoalInput = (props) => {
 
   const [locationIsSet, setLocationIsSet] = useState(false);
 
+  const [isLoading, setLoading] = useState(true);
+
+  const [respObj, setRespObj] = useState("");
+
   const goalInputHnadler = (enteredText) => {
     setEnteredJar(enteredText);
   };
@@ -241,7 +268,7 @@ const GoalInput = (props) => {
       location: currentLocationLat,
       jarNum: enteredJar,
       comments: enteredComments,
-      time: Date().toString(),
+      time: getTimeStamp(),
     };
 
     if (props.data) {
@@ -251,9 +278,6 @@ const GoalInput = (props) => {
     defaultVal = "";
     defaultTemp = "";
     props.onAddGoal(values);
-
-    //setEnteredGoal("");
-    //setEnteredTemp("");
   };
 
   const [isCameraMode, setIsCameraMode] = useState(false);
@@ -267,64 +291,114 @@ const GoalInput = (props) => {
   };
 
   const cancelObservationHandler = () => {
+    console.log("in cancel");
     //setEnteredGoal('');
+    setLoading(true);
     props.onCancel();
     //setIsEditMode(false);
     setLocationIsSet(false);
+
     defaultTemp = "";
     defaultVal = "";
   };
 
-  // const deleteHandler = () => {
-  //   props.onDelete();
-  // }
+  const createButtonAlert = () => {
+    Alert.alert(
+      "Submission Successful!",
+      [{ text: "OK", onPress: () => cancelObservationHandler() }],
+      { cancelable: false }
+    );
+  }
 
-  //{"siteid": "big1", "t": "2019-10-22 07:24:37", "name": "depth" }
-  const [isLoading, setLoading] = useState(true);
-  const [respObj, setRespObj] = useState("");
-
-  const putRequest = async () => {
+  const putRequest = async (dateTime, jarNum, observer) => {
     try {
       let response = await fetch(
         "http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
         {
           method: "PUT",
-          // headers: {
-          //   Accept: 'application/json',
-          //   'Content-Type': 'application/json',
-          // },
-          //{"siteid": "big1", "deviceid": "20449344", "t": "2019-11-22 07:24:37", "dobtype": "WaterQuantity", "name": "depth", "value": -1.2336, "status": "new", "observer": "csvfile"}
           body: JSON.stringify({
             siteid: "yerc",
-            t: "2019-11-22 07:24:37",
-            dobtype: "TEST",
-            //dobcode: "EXAMPLE1",
-            name: "example1",
-            value: -1.2336,
+            t: dateTime,
+            dobtype: "WQSample",
+            name: "jar",
+            value: jarNum,
             status: "new",
-            observer: "jjg.akers@gmail.com",
+            observer: observer,
           }),
         }
-      )
-        .then((response) => response.json())
-        .then((responseJson) => {
-          setLoading(false);
-          setRespObj(responseJson);
-        });
+      ).then((response) => {
+        if (response.status <= 200 && response.status < 300) {
+          response.json().then((responseJSON) => {
+            if (responseJSON.statuscode !== 200) {
+              //console.log("bad response");
+              console.log("bad request: ", responseJSON.statuscode);
+              alert("Could not complete request:\n\n" + responseJSON.msg);
+            } else {
+              //setLoading(false);
+              //setRespObj(responseJSON);
+              //removeObsHandler(observationID);
+              alert("Submission Successful!");
+              cancelObservationHandler();
+      
+
+              // Alert.alert(
+              //   "Submission Successful!",
+              //   [{ text: "OK", onPress: () => cancelObservationHandler() }],
+              //   { cancelable: false }
+              // );
+
+              //createButtonAlert();
+              
+              // alert(
+              //   "Submission Successful!",
+
+              //   {
+              //     text: "OK",
+              //     onPress: () => {
+              //       cancelObservationHandler();
+              //     },
+              //   },
+
+              //   { cancelable: false }
+              // );
+              //ancelObservationHandler();
+            }
+          });
+        } else {
+          //console.log("bad response");
+          console.log(
+            "ERROR, response status: ",
+            response.status,
+            response.headers
+          );
+          alert("Unable to submit!\nPlease try again later");
+        }
+      });
 
       // let responseJson = await response.json();
       // return responseJson.msg;
     } catch (error) {
       console.error(error);
     }
+    //     .then((response) => response.json())
+    //     .then((responseJson) => {
+    //       setLoading(false);
+    //       setRespObj(responseJson);
+    //     });
+
+    //   // let responseJson = await response.json();
+    //   // return responseJson.msg;
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 
-  if (!isLoading) {
-    console.log(respObj);
-  }
+  // if (!isLoading) {
+  //   console.log(respObj);
+  // }
 
   const postRequest = () => {
-    console.log("in put request");
+    console.log("in post request");
     //props.onAddGoal(enteredGoal, enteredOther);
     // testing post request
     // async function getMoviesFromApi() {
@@ -362,13 +436,14 @@ const GoalInput = (props) => {
   };
 
   const submitObservationHanler = () => {
-    putRequest();
+    // validate fields
+    // send jarnumber, user, datetime
+    let jarNum = enteredJar;
+    let observer = props.id;
+    let datetime = getTimeStamp();
 
-    //props.onSubmit();
-
-    //reset flags
-    setLocationIsSet(false);
-    //setIsEditMode(false);
+    putRequest(datetime, jarNum, observer);
+    //cancelObservationHandler();
   };
 
   //const locationRef = useRef("loading");
@@ -400,15 +475,14 @@ const GoalInput = (props) => {
         //setSiteID(lat + ", " + long);
 
         setLocationIsSet(true);
-        console.log("in locperm status granted, location: ", location.coords);
+        //console.log("in locperm status granted, location: ", location.coords);
       } else {
-        console.log("perm denied: ", locperm.status);
+        console.log("location perm denied: ", locperm.status);
         setLocationLat("Unavailable");
-
         //setLocationIsSet(true);
       }
     } else {
-      console.log("in perm already granted");
+      //console.log("in perm already granted");
       let location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Highest,
       });
@@ -421,7 +495,7 @@ const GoalInput = (props) => {
 
       //setSiteID(lat + ", " + long);
 
-      console.log("perm already granted location: ", currentLocationLat);
+      //console.log("perm already granted location: ", currentLocationLat);
       setLocationIsSet(true);
     }
 
@@ -431,11 +505,11 @@ const GoalInput = (props) => {
         Math.abs(site.latitude - lat) <= 0.05 &&
         Math.abs(site.longitude - long) <= 0.05
       ) {
-        console.log("site lat: ", site.id);
-        console.log("diff: ", Math.abs(site.latitude - currentLocationLat));
+        //console.log("site lat: ", site.id);
+        //console.log("diff: ", Math.abs(site.latitude - currentLocationLat));
         //siteIDFound = true;
         setSiteID(site.id);
-        console.log("sitename: ", site.id);
+        //console.log("sitename: ", site.id);
       }
       // if (siteIDFound){
       //   break;
@@ -445,51 +519,80 @@ const GoalInput = (props) => {
   };
 
   if (props.visible && !locationIsSet && !props.data) {
-    console.log("in if props visible");
     getLocation();
   }
 
+  //--- if site id unavailable, offer dropdown ----
+  const [lang, setlang] = useState("js");
+
   return (
-    <Modal visible={props.visible} animationType="slide">
+    // <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS == "ios" ? "height" : "height"}>
+
+    <Modal visible={props.visible} animationType="slide" transparent={true}>
       <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
         }}
       >
-        <View style={styles.inputContainer}>
-          <View style={styles.location}>
+        <View style={styles.inputScreen}>
+          <View style={styles.inputContainer}>
+            {/* <View style={styles.location}>
             <Text>Location: {currentLocationLat}</Text>
-            <Text>Site ID: {siteID}</Text>
+          </View> */}
+            <View style={styles.pickerContainer}>
+              <View>
+                <Text>Site ID:</Text>
+              </View>
+              <Picker
+                style={styles.twoPickers}
+                itemStyle={styles.twoPickerItems}
+                selectedValue={siteID}
+                onValueChange={(itemValue) => {
+                  setSiteID(itemValue);
+                }}
+              >
+                {siteInfo.map((value, index) => {
+                  return (
+                    <Picker.Item
+                      key={index}
+                      label={value.id}
+                      value={value.id}
+                    />
+                  );
+                })}
+              </Picker>
+            </View>
 
+            {/* <Text>Site ID: {siteID}</Text> */}
 
-          </View>
-          {/* onchange text takes a function that will execute everything text is updated */}
-          {/* <Text>{Date().toString}</Text> */}
-          <View style={styles.jarContainer}>
-            <Text>Jar Number: </Text>
-          <TextInput
-            defaultValue={defaultVal}
-            placeholder="Jar Number"
-            keyboardType="numeric"
-            //{props.data.obsData.temp}
-            style={styles.input}
-            onChangeText={goalInputHnadler}
-            // set the value of the component to the current state, which will change on every text input:
-            //value={defaultVal}
-          />
-          </View>
-          <View style={styles.commentContainer}>
-            <TextInput
-              defaultValue={defaultTemp}
-              //placeholder='Temp'
-              multiline={true}
-              placeholder="Comments"
-              style={[styles.input, {borderBottomColor: 'transparent'}]}
-              onChangeText={commentsInputHnadler}
-              //value={enteredTemp}
-            />
-          </View>
-          <View style={styles.photoContainer}>
+            {/* onchange text takes a function that will execute everything text is updated */}
+            {/* <Text>{Date().toString}</Text> */}
+            <View style={styles.jarContainer}>
+              <Text>Jar Number: </Text>
+              <TextInput
+                defaultValue={defaultVal}
+                placeholder="Jar Number"
+                keyboardType="numeric"
+                //{props.data.obsData.temp}
+                style={styles.input}
+                onChangeText={goalInputHnadler}
+                // set the value of the component to the current state, which will change on every text input:
+                //value={defaultVal}
+              />
+            </View>
+            <View style={styles.commentContainer}>
+              <TextInput
+                defaultValue={defaultTemp}
+                //placeholder='Temp'
+                multiline={true}
+                placeholder="Comments"
+                style={[styles.input, { borderBottomColor: "transparent" }]}
+                onChangeText={commentsInputHnadler}
+                //value={enteredTemp}
+              />
+            </View>
+
+            {/* <View style={styles.photoContainer}>
             <View style={styles.photoButton}>
               <Button title="Add Photo" onPress={addCameraModeHandler} />
             </View>
@@ -502,42 +605,55 @@ const GoalInput = (props) => {
               style={styles.img}
               source={require("../yerc_whitegreen.png")}
             />
-          </View>
-          <View style={styles.btnContainer}>
-            <View style={styles.button}>
-              <Button
-                title="CANCEL"
-                color="red"
-                onPress={cancelObservationHandler}
-              />
-            </View>
-            <View style={styles.button}>
-              <Button title="SAVE" onPress={addObsHandler} />
-            </View>
-          </View>
+          </View> */}
 
-          <View style={styles.btnContainer}>
-            <View style={styles.button}>
-              <Button title="SUBMIT" onPress={submitObservationHanler} />
+            <View style={styles.btnContainer}>
+              <View style={styles.button}>
+                <Button
+                  title="CANCEL"
+                  color="red"
+                  onPress={cancelObservationHandler}
+                />
+              </View>
+              <View style={styles.button}>
+                <Button
+                  title="SAVE"
+                  fontWeight="bold"
+                  onPress={addObsHandler}
+                />
+              </View>
+            </View>
+
+            <View style={styles.btnContainer}>
+              <View style={styles.button}>
+                <Button title="SUBMIT" onPress={submitObservationHanler} />
+              </View>
             </View>
           </View>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
+    // </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  inputScreen: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
   inputContainer: {
-    flex: 1, // lets you conrol how much space the container will take up
+    backgroundColor: "rgba(0,0,0,0.5)",
+
+    //flex: .5, // lets you conrol how much space the container will take up
     // flexDirection: "row",
-    justifyContent: "center",
+    //justifyContent: "center",
     alignItems: "center",
     //borderColor: "black",
     //borderWidth: 1,
     //marginTop: 80,
     marginHorizontal: 20,
-    marginVertical: 80,
+    marginTop: 100,
     shadowColor: "black",
     shadowOffset: {
       width: 0,
@@ -547,29 +663,40 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.26,
     backgroundColor: "white",
     elevation: 5,
-    padding: 10,
+    padding: 20,
     borderRadius: 20,
   },
+  pickerContainer: {
+    flexDirection: "row",
+    borderColor: "grey",
+    borderWidth: 1,
+    alignItems: "center",
+    width: "80%",
+    padding: 5,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
   jarContainer: {
-    flexDirection: 'row',
-    width: '80%',
+    backgroundColor: "white",
+    flexDirection: "row",
+    width: "80%",
     //alignContent: 'center',
     //justifyContent: "center",
     marginBottom: 10,
     padding: 10,
-    borderColor: 'grey',
+    borderColor: "grey",
     borderWidth: 1,
     borderRadius: 10,
   },
   commentContainer: {
+    backgroundColor: "white",
     //flex: 1,
-    borderColor: 'grey',
+    borderColor: "grey",
     borderWidth: 1,
-    width: '80%',
+    width: "80%",
     minHeight: 100,
     borderRadius: 10,
     padding: 10,
-
   },
   input: {
     width: "80%",
@@ -579,6 +706,7 @@ const styles = StyleSheet.create({
     //marginBottom: 10,
   },
   location: {
+    //flexDirection: "row",
     width: "80%",
     //borderBottomColor: "black",
     //borderBottomWidth: 1,
@@ -592,10 +720,22 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   button: {
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowRadius: 1,
+    shadowOpacity: 0.26,
+    backgroundColor: "#e6e6e6",
+    elevation: 5,
+    //padding: 20,
+    borderRadius: 10,
     fontSize: 5,
-    borderWidth: 1,
-    borderColor: "black",
+    borderWidth: 1.5,
+    borderColor: "#757575",
     width: "40%",
+    //fontWeight: 'bold',
   },
   photoContainer: {
     flexDirection: "row",
@@ -616,6 +756,30 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderWidth: 1,
     height: 50,
+  },
+  twoPickers: {
+    justifyContent: "center",
+    width: "80%",
+    height: 30,
+    //backgroundColor: "#e6e6e6",
+    //margin: 0,
+    // padding: 0,
+    //borderColor: "black",
+    //borderWidth: 1,
+    // borderColor: "black",
+    // borderWidth: 1,
+  },
+  twoPickerItems: {
+    transform: [{ scaleX: 0.75 }, { scaleY: 0.75 }],
+    height: 80,
+    color: "black",
+    //borderColor: "black",
+    //borderWidth: 1,
+    padding: 0,
+    margin: 0,
+    textDecorationLine: "none",
+    //textDecorationStyle: 'none',
+    //fontSize: 10,
   },
 });
 

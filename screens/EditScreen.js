@@ -96,7 +96,7 @@ const EditScreen = (props) => {
         route.params.userID,
         JSON.stringify(obsToStore), () => {
             AsyncStorage.getItem(route.params.userID, (err, result) => {
-            console.log("result of merge: ", result);
+            //console.log("result of merge: ", result);
           });
         }
       );

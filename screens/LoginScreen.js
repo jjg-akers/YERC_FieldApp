@@ -10,6 +10,8 @@ import {
   AsyncStorage,
   ImageBackground,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 import Card from "../components/Card";
@@ -37,8 +39,6 @@ const LoginScreen = (props) => {
       console.log("error: ", error.message);
     }
 
-    console.log("after catdch");
-
     setLoggedIn(true);
   };
 
@@ -64,7 +64,6 @@ const LoginScreen = (props) => {
   // check user id
   //console.log(getUserID());
 
-
   const login = async (email) => {
     //console.log("in log in func: ", email);
     //let userID = "";
@@ -72,14 +71,11 @@ const LoginScreen = (props) => {
     try {
       let userInfo = await AsyncStorage.getItem(email);
       if (userInfo) {
-        //console.log("in if userInfo");
         let data = JSON.parse(userInfo);
-        console.log("userinfo: ", data);
-        //console.log("user id: ", data.id);
+        //console.log("userinfo: ", data);
+
         setUserEmail(data.id);
         setUserData(data);
-        //setLoggedIn(true);
-        //content = <ProfileScreen removeEmail={removeUser} />;
       } else {
         // user was not in system
         console.log("nothing in userInfo");
@@ -92,11 +88,11 @@ const LoginScreen = (props) => {
           Observations: [],
         };
 
-        console.log("else user info: ", userInfo);
+        //console.log("else user info: ", userInfo);
+
         // save a new user
         setUserData(userInfo);
         saveUserID(userInfo);
-        //setLoggedIn(true);
       }
       //return userID;
       setLoggedIn(true);
@@ -104,8 +100,6 @@ const LoginScreen = (props) => {
       //error retrieving data
       console.log("Error getting data: ", error.message);
     }
-    //setLoggedIn(true);
-    //return userID;
   };
 
   /// -------- end Login --------
@@ -126,14 +120,12 @@ const LoginScreen = (props) => {
   const validate = (email) => {
     const expression = /(?!.*\.{2})^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([\t]*\r\n)?[\t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([\t]*\r\n)?[\t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
 
-    return expression.test(String(email).toLowerCase())
-}
+    return expression.test(String(email).toLowerCase());
+  };
 
   const validateInputHandler = () => {
-
     let val = validate(enteredValue);
-    console.log('in validate: ', val);
-
+    console.log("in validate: ", val);
 
     if (enteredValue !== "jjg.akers@gmail.com") {
       Alert.alert(
@@ -169,7 +161,7 @@ const LoginScreen = (props) => {
     if (userData.id) {
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Profile', params: {user: userData}}],
+        routes: [{ name: "Profile", params: { user: userData } }],
         //params: {user: userData},
       });
 
@@ -179,15 +171,16 @@ const LoginScreen = (props) => {
       //     actions: [NavigationAction.navigate("Profile", { user: userData })]
       //   })
       // );
-   //navigation.navigate("Profile", { user: userData });
+      //navigation.navigate("Profile", { user: userData });
     }
   }
 
   //const image = { uri: "https://reactjs.org/logo-og.png" };
   const image = require("../yerc_whitegreen.png");
 
-
   return (
+    // <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS == "ios" ? "padding" : "padding"}>
+
     <TouchableWithoutFeedback
       onPress={() => {
         Keyboard.dismiss();
@@ -198,9 +191,6 @@ const LoginScreen = (props) => {
         {/* <Text style={styles.title}>Login</Text> */}
         {/* <ImageBackground source={image} style={styles.image}> */}
 
-        <Image style={styles.backgroundImage} source={image}>
-
-        </Image>
         <Card style={styles.inputContainer}>
           <Text>Enter Email</Text>
           <Input
@@ -221,19 +211,24 @@ const LoginScreen = (props) => {
                 color={Colors.accent}
               />
             </View>
-            <View style={styles.button}>
-              <Button
-                title="Sign Up"
-                onPress={() => {}}
-                color={Colors.primary}
-              />
-            </View>
+            {/* <View style={styles.button}>
+                <Button
+                  title="Sign Up"
+                  onPress={() => {}}
+                  color={Colors.primary}
+                />
+              </View> */}
           </View>
         </Card>
-          {/* <Text style={styles.text}>Inside</Text> */}
+
+
+        <Image style={styles.backgroundImage} source={image}></Image>
+
+        {/* <Text style={styles.text}>Inside</Text> */}
         {/* </ImageBackground> */}
       </View>
     </TouchableWithoutFeedback>
+    // </KeyboardAvoidingView>
   );
 };
 
@@ -249,49 +244,56 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: 275,
+    marginVertical: 20,
     maxWidth: "80%",
     alignItems: "center",
   },
   buttonContainer: {
     flexDirection: "row",
     width: "100%",
-    justifyContent: "space-between",
+    justifyContent: "center",
     paddingHorizontal: 15,
   },
   button: {
     width: 100,
+    fontWeight: "bold",
   },
   input: {
     width: "70%",
     textAlign: "center",
   },
-  image: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    //resizeMode: 'cover',
-    justifyContent: "center",
-    alignItems: 'center'
-  },
+  // image: {
+  //   flex: 1,
+  //   width: "80%",
+  //   height: "80%",
+  //   borderRadius: 10,
+  //   borderColor: 'black',
+  //   borderWidth: 1,
+  //   //resizeMode: 'cover',
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  // },
   text: {
     color: "grey",
     fontSize: 30,
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   backgroundImage: {
     //position: 'absolute',
-    width: '95%',
-    height: '30%',
+    width: "90%",
+    height: "100%",
     //top: 150,
-    resizeMode: 'contain',
+    resizeMode: "contain",
+    flex: .4,
+    //padding: -30,
+    //margin: 50,
     //arginHorizontal:
-//     top: 0,
-//     left: 0,
-//     bottom: 0,
-//     right: 0,
-//     opacity: 0.3
- },
-
+    //     top: 0,
+    //     left: 0,
+    //     bottom: 0,
+    //     right: 0,
+    //     opacity: 0.3
+  },
 });
 
 export default LoginScreen;

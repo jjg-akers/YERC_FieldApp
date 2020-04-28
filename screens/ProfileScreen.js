@@ -31,7 +31,6 @@ import * as Permissions from "expo-permissions";
 import DrawerNavigator from "../navigation/DrawerNavigator";
 
 const ProfileScreen = (props) => {
-
   const { route, navigation } = props;
   //console.log('route: ', route);
   const { user } = route.params;
@@ -56,8 +55,8 @@ const ProfileScreen = (props) => {
     ),
   });
 
-   // Function to completely remove user and data from phone (essetially reset app)
-   const deleteUserID = async (useID) => {
+  // Function to completely remove user and data from phone (essetially reset app)
+  const deleteUserID = async (useID) => {
     console.log("deleting user");
     try {
       await AsyncStorage.removeItem("jjg.akers@gmail.com");
@@ -73,9 +72,8 @@ const ProfileScreen = (props) => {
     // });
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Login'}],
+      routes: [{ name: "Login" }],
     });
-    
   };
 
   //console.log('at profile screen: ', user);
@@ -126,10 +124,6 @@ const ProfileScreen = (props) => {
       setIsAddMode(false);
       //.obsData = values;
     } else {
-      console.log("in else: ");
-      //console.log("valuse: ", values);
-
-      //var newObsID = Math.random().toString();
       setObservations((currentObservation) => [
         ...obsParams,
         { id: Math.random().toString(), obsData: values },
@@ -151,19 +145,13 @@ const ProfileScreen = (props) => {
       Observations: obsParams,
     };
 
-    console.log("user id in update saved obs", user.id);
-    //AsyncStorage.setItem('dateTime', JSON.stringify(obsToStore), () => {
-    //console.log(props.userData.email);
-
-    // let userInfo = await AsyncStorage.getItem(props.userData.id);
-    //console.log("user info: ", userInfo);
     try {
       await AsyncStorage.mergeItem(
         user.id,
         JSON.stringify(obsToStore),
         async () => {
           await AsyncStorage.getItem(user.id, (err, result) => {
-            console.log("result of merge: ", result);
+            //console.log("result of merge: ", result);
           });
         }
       );
@@ -174,13 +162,10 @@ const ProfileScreen = (props) => {
 
   // check if new obs
   if (newObs) {
-    //console.log("in if newObs");
     // call update func
     updateSavedObs();
     setNewObs(false);
   }
-
-  //updateSavedObs();
 
   const addGoalHandler = (goalTitle) => {
     //want to add our entered goal to a list of goals
@@ -194,43 +179,15 @@ const ProfileScreen = (props) => {
   };
 
   const removeObsHandler = (observationID) => {
-    //console.log('obs id: ', observationID);
-    // remove the observation from memory
-    // const deleteUserID = async () => {
-    //   console.log("deleting user");
-    //   try {
-    //     await AsyncStorage.removeItem("jjg.akers@gmail.com");
-    //   } catch (error) {
-    //     console.log("error deleting: ", error);
-    //   }
-    // };
-    ///console.log("obs params before fileter: ", obsParams);
     // remove from flat list
     let filteredObs = obsParams.filter(function (value, index, arr) {
       return value.id !== observationID;
     });
 
-    //console.log("filtered obse: ", filteredObs);
-    // async () => {
-
-    // setObservations('');
-    // }
-    //console.log("obsparams after setting empti: ", obsParams);
-
-    // useEffect(() => {
     setObservations(filteredObs);
 
     console.log("in setObservations");
-    // });
-    // setObservations(currentObservations => {
-    //   return currentObservations.filter(
-    //     observation => observation.id !== observationID
-    //   );
-    // });
 
-    //console.log("obsparams after removing: ", obsParams);
-
-    // update saved obs
     updateSavedObs();
   };
 
@@ -258,33 +215,47 @@ const ProfileScreen = (props) => {
   const [isLoading, setLoading] = useState(true);
   const [respObj, setRespObj] = useState("");
 
-  const putRequest = async () => {
+  // submit to db
+  const putRequest = async (dateTime, jarNum, observer, observationID) => {
     try {
       let response = await fetch(
         "http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
         {
           method: "PUT",
-          // headers: {
-          //   Accept: 'application/json',
-          //   'Content-Type': 'application/json',
-          // },
-          //{"siteid": "big1", "deviceid": "20449344", "t": "2019-11-22 07:24:37", "dobtype": "WaterQuantity", "name": "depth", "value": -1.2336, "status": "new", "observer": "csvfile"}
           body: JSON.stringify({
             siteid: "yerc",
-            t: "2020-03-22 07:24:37",
-            dobtype: "Test",
-            name: "example1",
-            value: -1.2336,
+            t: dateTime,
+            dobtype: "WQSample",
+            name: "jar",
+            value: jarNum,
             status: "new",
-            observer: "test from app",
+            observer: observer,
           }),
         }
-      )
-        .then((response) => response.json())
-        .then((responseJson) => {
-          setLoading(false);
-          setRespObj(responseJson);
-        });
+      ).then((response) => {
+        if (response.status <= 200 && response.status < 300) {
+          response.json().then((responseJSON) => {
+            if (responseJSON.statuscode !== 200) {
+              //console.log("bad response");
+              console.log("bad request: ", responseJSON.statuscode);
+              alert("Could not complete request:\n\n" + responseJSON.msg);
+            } else {
+              //setLoading(false);
+              //setRespObj(responseJSON);
+              removeObsHandler(observationID);
+              alert("Submission Successful!");
+            }
+          });
+        } else {
+          //console.log("bad response");
+          console.log(
+            "ERROR, response status: ",
+            response.status,
+            response.headers
+          );
+          alert("Unable to submit!\nPlease try again later");
+        }
+      });
 
       // let responseJson = await response.json();
       // return responseJson.msg;
@@ -293,25 +264,35 @@ const ProfileScreen = (props) => {
     }
   };
 
-  const submitEditObsHandler = () => {
-    console.log("in submitEditObs Handler");
+  // if (!isLoading) {
+  //   //console.log("responseJSON: ", respObj);
+  // }
+
+  const submitEditObsHandler = (observationID) => {
+    // get correct observation:
+    let currentData = obsParams.filter((observation) => {
+      return observation.id === observationID;
+    });
+
+    let observer = user.id;
+    let jarnum = currentData[0].obsData.jarNum;
+    let datetime = currentData[0].obsData.time;
+
+    // navigation.navigate("EditScreen", {
+    //   obsInfo: currentData[0],
+    //   userID: user.id,
+    //   allObs: obsParams,
+    // });
+
+    //console.log("in submitEditObs Handler");
     // call submit function
-    putRequest();
+    // datetime, jarnum, observer
+    putRequest(datetime, jarnum, observer, observationID);
 
-    if (!isLoading) {
-      console.log(respObj);
-    }
+    // if (!isLoading) {
+    //   console.log(respObj);
+    // }
   };
-
-  // const submitObservationHanler = () => {
-  //   putRequest();
-
-  //   //props.onSubmit();
-
-  //   //reset flags
-  //   setLocationIsSet(false);
-  //   //setIsEditMode(false);
-  // };
 
   const addModeHandler = () => {
     setIsAddMode(true);
@@ -328,44 +309,6 @@ const ProfileScreen = (props) => {
     setEditData("");
   };
 
-  //camer stuff
-  const takePitureHandler = () => {};
-
-  // const [isCameraMode, setIsCameraMode] = useState(false);
-
-  // const addCameraModeHandler = () => {
-  //   setIsCameraMode(true);
-  // };
-
-  // const cancelCameraHandler = () => {
-  //   setIsCameraMode(false);
-  // };
-
-  // const storageHandler = () => {
-  //   let UID123_object = {
-  //     name: 'Chris',
-  //     age: 30,
-  //     traits: { hair: 'brown', eyes: 'brown' },
-  //   };
-  //   // You only need to define what will be added or updated
-  //   let UID123_delta = {
-  //     age: 31,
-  //     traits: { eyes: 'blue', shoe_size: 10 },
-  //   };
-
-  //   AsyncStorage.setItem('UID123', JSON.stringify(UID123_object), () => {
-  //     AsyncStorage.mergeItem('UID123', JSON.stringify(UID123_delta), () => {
-  //       AsyncStorage.getItem('UID123', (err, result) => {
-  //         console.log(result);
-  //       });
-  //     });
-  //   });
-
-  //   // Console log result:
-  //   // => {'name':'Chris','age':31,'traits':
-  //   //    {'shoe_size':10,'hair':'brown','eyes':'blue'}}
-
-  // };
   const logoutHandler = () => {
     props.removeEmail();
   };
@@ -377,13 +320,6 @@ const ProfileScreen = (props) => {
     console.log("in initialize");
 
     if (user.Observations) {
-      console.log("in user observations");
-      //console.log('something in obs: ', props.userData.Observations);
-
-      // need to get observations into obsparams
-      //console.log('Observations: ', props.userData.Observations);
-      //console.log('user observations: ', user.Observations);
-
       setObservations(user.Observations);
     } else {
       console.log("nothing in obs");
@@ -395,8 +331,6 @@ const ProfileScreen = (props) => {
   const setSettingsLow = () => {
     setIsSettingsMode(false);
   };
-
-  // submit to db
 
   return (
     <View style={styles.screen}>
@@ -417,15 +351,10 @@ const ProfileScreen = (props) => {
                 name="md-close-circle"
                 style={{ paddingRight: 30 }}
               />
-              {/* <Button
-      onPress={() => alert("Button Pressed")}
-      title="Info"
-      color="#fff"
-    /> */}
             </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={styles.logout}>
-                <Button title="Log out" onPress={deleteUserID}/>
+            <TouchableOpacity onPress={deleteUserID}>
+              <View style={styles.logout} >
+                <Text> Log out </Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -445,6 +374,7 @@ const ProfileScreen = (props) => {
         onAddGoal={addObservationHandler}
         onCancel={cancelObsAddHandler}
         data={editData}
+        id={user.id}
         //onSubmit={submitObsHandler}
         //location={currentLocation}
         //onDelete={removeObsHandler}
@@ -478,8 +408,12 @@ const ProfileScreen = (props) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    padding: 10,
+    //padding: 10,
+    //margin: 0,
     alignItems: "center",
+    //width: '80%',
+    //borderColor: "black",
+    borderWidth: 1,
   },
   btns: {
     marginVertical: 10,
@@ -489,45 +423,56 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   settingsScreen: {
-    backgroundColor: "rgba(0,0,0,0.5)",
-    flex: 1,
+    //backgroundColor: "rgba(0,0,0,0.5)",
+    //flex: .5,
     margin: 0,
-    padding: 0,
+    paddingHorizontal: 1,
+    paddingBottom: 10,
+    marginBottom: 10,
+    position: "absolute",
+    width: "100%",
+    height: 100,
+    bottom: 0,
   },
   settingsContainer: {
-    backgroundColor: "rgba(0,0,0,0.5)",
-    flex: 1, // lets you conrol how much space the container will take up
-    // flexDirection: "row",
-    //justifyContent: "center",
+    backgroundColor: "white",
+    //flex: 1, // lets you conrol how much space the container will take up
+    flexDirection: "row",
+    justifyContent: "center",
+
     alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "black",
+    //marginBottom: 10,
+    paddingBottom: 30,
+    paddingTop: 20,
     //borderColor: "black",
     //borderWidth: 1,
     //marginTop: 80,
-    marginHorizontal: 40,
-    marginVertical: 200,
-    shadowColor: "black",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowRadius: 6,
-    shadowOpacity: 0.26,
-    backgroundColor: "white",
-    elevation: 5,
-    padding: 10,
-    borderRadius: 20,
+    //marginHorizontal: 40,
+    //marginBottom: 20,
+    //padding: 10,
+    // shadowColor: "black",
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowRadius: 6,
+    // shadowOpacity: 0.26,
+    // backgroundColor: "white",
+    // elevation: 5,
+    // borderRadius: 20,
   },
   logout: {
+    justifyContent: 'center',
+    alignItems: 'center',
     borderColor: "black",
     borderWidth: 1,
     borderRadius: 10,
-    width: "60%",
+    width: 100,
+    height: 50,
+    backgroundColor: '#ff8f8f',
   },
 });
-
-const quotes = [
-  { id: "0", text: "It’s just a flesh wound." },
-  { id: "1", text: "That is my least vulnerable spot." },
-];
 
 export default ProfileScreen;
