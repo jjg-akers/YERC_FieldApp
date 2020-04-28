@@ -128,7 +128,7 @@ const LoginScreen = (props) => {
     console.log("in validate: ", val);
 
     //if (enteredValue !== "jjg.akers@gmail.com") {
-      if (!val){
+    if (!val) {
       Alert.alert(
         "Invalid Email Address!",
         "Address must be in the form: email@example.com",
@@ -222,7 +222,6 @@ const LoginScreen = (props) => {
           </View>
         </Card>
 
-
         <Image style={styles.backgroundImage} source={image}></Image>
 
         {/* <Text style={styles.text}>Inside</Text> */}
@@ -285,7 +284,7 @@ const styles = StyleSheet.create({
     height: "100%",
     //top: 150,
     resizeMode: "contain",
-    flex: .4,
+    flex: 0.4,
     //padding: -30,
     //margin: 50,
     //arginHorizontal:
