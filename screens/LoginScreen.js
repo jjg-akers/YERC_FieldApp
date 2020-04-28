@@ -127,7 +127,8 @@ const LoginScreen = (props) => {
     let val = validate(enteredValue);
     console.log("in validate: ", val);
 
-    if (enteredValue !== "jjg.akers@gmail.com") {
+    //if (enteredValue !== "jjg.akers@gmail.com") {
+      if (!val){
       Alert.alert(
         "Invalid Email Address!",
         "Address must be in the form: email@example.com",
