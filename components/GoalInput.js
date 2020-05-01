@@ -519,6 +519,7 @@ const GoalInput = (props) => {
   };
 
   if (props.visible && !locationIsSet && !props.data) {
+    console.log('in props visible');
     getLocation();
   }
 
