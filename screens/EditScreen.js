@@ -16,15 +16,11 @@ import Colors from "../constants/colors";
 import Input from "../components/Input";
 
 const EditScreen = (props) => {
-  console.log("in edit screen");
+  //console.log("in edit screen");
 
   const { route, navigation } = props;
   const observationData = route.params.obsInfo;
   var allObservations = route.params.allObs;
-
-  //console.log('route info: ', allObservations);
-
-  //console.log('data:', observationData);
 
   const [enteredJar, setEnteredJar] = useState(observationData.obsData.jarNum);
   
@@ -32,9 +28,6 @@ const EditScreen = (props) => {
     observationData.obsData.comments
   );
 
-  // const [enteredTitle, setEnteredTitle] = useState(
-  //   observationData.obsData.title
-  // );
   const [enteredLocation, setEnteredLocation] = useState(
     observationData.obsData.location.toString()
   );
@@ -62,7 +55,7 @@ const EditScreen = (props) => {
   };
 
   const updateSavedObs = async () => {
-    console.log("in updateSavedObs");
+    //console.log("in updateSavedObs");
 
     //console.log("obs params in update: ", obsParams);
     let newObsData = {
@@ -84,12 +77,6 @@ const EditScreen = (props) => {
     let obsToStore = {
       Observations: route.params.allObs,
     };
-
-    //AsyncStorage.setItem('dateTime', JSON.stringify(obsToStore), () => {
-    //console.log(props.userData.email);
-
-    // let userInfo = await AsyncStorage.getItem(props.userData.id);
-    //console.log("user info: ", userInfo);
     try {
       console.log("in try");
       await AsyncStorage.mergeItem(
@@ -106,15 +93,11 @@ const EditScreen = (props) => {
   };
 
   const saveObsHandler = () => {
-    console.log("in saveobs handler");
-    // let data = obsParams.filter((observation) => {
-    //   return observation.id === observationID;
-    // });
     // save data to memory,
     // navigate back to other screen
     updateSavedObs();
 
-    console.log("after update");
+    //console.log("after update");
 
     navigation.navigate('Profile', {newObs: route.params.allObs});
   };
@@ -130,8 +113,6 @@ const EditScreen = (props) => {
       }}
     >
       <View style={styles.screen}>
-        {/* <Text style={styles.title}>Login</Text> */}
-
         <Card style={styles.inputContainer}>
           <View style={styles.subContainer}>
             <Text>Location: </Text>
@@ -140,9 +121,6 @@ const EditScreen = (props) => {
               blurOnSubmit
               autoCapitalize="none"
               autoCorrect={false}
-              //autoCompleteType="email"
-              //keyboardType="email-address"
-              //onChangeText={emailInputHandler}
               value={enteredLocation}
             />
           </View>
@@ -154,28 +132,11 @@ const EditScreen = (props) => {
               autoCapitalize="none"
               autoCorrect={false}
               onChangeText={siteIDInputHnadler}
-              //autoCompleteType="email"
-              //keyboardType="email-address"
-              //onChangeText={emailInputHandler}
               value={enteredSiteID}
             />
           </View>
-
-          {/* <View style={styles.subContainer}>
-            <Text>Title: </Text>
-            <Input
-              //defaultValue={defaultVal}
-              placeholder="Title"
-              //{props.data.obsData.temp}
-              style={styles.input}
-              onChangeText={titleInputHnadler}
-              // set the value of the component to the current state, which will change on every text input:
-              value={enteredTitle}
-            />
-          </View> */}
           <View style={styles.subContainer}>
             <Text>Jar: </Text>
-
             <Input
               //defaultValue={defaultTemp}
               //placeholder='Temp'

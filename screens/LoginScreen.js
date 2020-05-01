@@ -75,8 +75,7 @@ const LoginScreen = (props) => {
         setUserData(data);
       } else {
         // user was not in system
-        console.log("nothing in userInfo");
-        //setUserData(null);
+        //console.log("nothing in userInfo");
 
         let userInfo = {
           id: email,
@@ -84,8 +83,6 @@ const LoginScreen = (props) => {
           Role: "Admin",
           Observations: [],
         };
-
-        //console.log("else user info: ", userInfo);
 
         // save a new user
         setUserData(userInfo);

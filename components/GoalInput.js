@@ -33,7 +33,7 @@ const getTimeStamp = () => {
     ":" +
     ("00" + d.getSeconds()).slice(-2);
 
-  console.log("date: ", Str);
+  //console.log("date: ", Str);
   return Str;
 };
 
@@ -291,24 +291,23 @@ const GoalInput = (props) => {
   };
 
   const cancelObservationHandler = () => {
-    console.log("in cancel");
-    //setEnteredGoal('');
+    //console.log("in cancel");
+
     setLoading(true);
     props.onCancel();
-    //setIsEditMode(false);
     setLocationIsSet(false);
 
     defaultTemp = "";
     defaultVal = "";
   };
 
-  const createButtonAlert = () => {
-    Alert.alert(
-      "Submission Successful!",
-      [{ text: "OK", onPress: () => cancelObservationHandler() }],
-      { cancelable: false }
-    );
-  }
+  // const createButtonAlert = () => {
+  //   Alert.alert(
+  //     "Submission Successful!",
+  //     [{ text: "OK", onPress: () => cancelObservationHandler() }],
+  //     { cancelable: false }
+  //   );
+  // }
 
   const putRequest = async (dateTime, jarNum, observer) => {
     try {
@@ -393,47 +392,44 @@ const GoalInput = (props) => {
     // }
   };
 
-  // if (!isLoading) {
-  //   console.log(respObj);
-  // }
+  // POST REQUEST EXAMPLE
+  // const postRequest = () => {
+  //   console.log("in post request");
+  //   //props.onAddGoal(enteredGoal, enteredOther);
+  //   // testing post request
+  //   // async function getMoviesFromApi() {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("email", "jjg.akers@gmail.com");
+  //     formData.append("latitude", "99999");
+  //     formData.append("longitude", "111111");
+  //     formData.append("watertemp", "123");
+  //     formData.append("comments", "From react-native app");
 
-  const postRequest = () => {
-    console.log("in post request");
-    //props.onAddGoal(enteredGoal, enteredOther);
-    // testing post request
-    // async function getMoviesFromApi() {
-    try {
-      const formData = new FormData();
-      formData.append("email", "jjg.akers@gmail.com");
-      formData.append("latitude", "99999");
-      formData.append("longitude", "111111");
-      formData.append("watertemp", "123");
-      formData.append("comments", "From react-native app");
+  //     let response = fetch(
+  //       //"http://rivernet-mobile.azurewebsites.net/observation",
+  //       {
+  //         method: "POST",
+  //         body: formData,
+  //         //   headers: {
+  //         //     Accept: "application/json",
+  //         //     "Content-Type": "applicatoin/json"
+  //         //   },
+  //         //   body: JSON.stringify({
+  //         //     email: "jjg.akers@gmail.com",
+  //         //     latitude: "99999",
+  //         //     longitue: "111111",
+  //         //     watertemp: "123"
+  //         //   })
+  //       }
+  //     );
 
-      let response = fetch(
-        //"http://rivernet-mobile.azurewebsites.net/observation",
-        {
-          method: "POST",
-          body: formData,
-          //   headers: {
-          //     Accept: "application/json",
-          //     "Content-Type": "applicatoin/json"
-          //   },
-          //   body: JSON.stringify({
-          //     email: "jjg.akers@gmail.com",
-          //     latitude: "99999",
-          //     longitue: "111111",
-          //     watertemp: "123"
-          //   })
-        }
-      );
-
-      //let responseJson = response.json();
-      console.log(response);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //     //let responseJson = response.json();
+  //     console.log(response);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const submitObservationHanler = () => {
     // validate fields
@@ -460,7 +456,7 @@ const GoalInput = (props) => {
       //console.log('perm: ', perm);
       // if locatin permission hasn't been granted yet, get permission
       let locperm = await Location.requestPermissionsAsync();
-      console.log(" in not granted, location perm: ", locperm.status);
+      //console.log(" in not granted, location perm: ", locperm.status);
 
       if (locperm.status === "granted") {
         let location = await Location.getCurrentPositionAsync({
@@ -477,7 +473,7 @@ const GoalInput = (props) => {
         setLocationIsSet(true);
         //console.log("in locperm status granted, location: ", location.coords);
       } else {
-        console.log("location perm denied: ", locperm.status);
+        //console.log("location perm denied: ", locperm.status);
         setLocationLat("Unavailable");
         //setLocationIsSet(true);
       }
@@ -519,7 +515,7 @@ const GoalInput = (props) => {
   };
 
   if (props.visible && !locationIsSet && !props.data) {
-    console.log('in props visible');
+    //console.log('in props visible');
     getLocation();
   }
 

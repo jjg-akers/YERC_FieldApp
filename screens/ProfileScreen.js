@@ -97,33 +97,7 @@ const ProfileScreen = (props) => {
     setIsSettingsMode(true);
   };
 
-  //console.log('obs params: ', obsParams);
-
-  // const updateObsHandler = observationID => {
-
-  //   // update an observation
-  //   obsParams[observationID]
-  //   setObservations(currentObservations => {
-  //     return currentObservations.filter(
-  //       observation => observation.id !== observationID
-  //     );
-  //   });
-  // };
-
   const addObservationHandler = async (values) => {
-    // if (values.id) {
-    //   //console.log(obsParams[id])
-    //   let obs = obsParams.filter((observation) => {
-    //     return observation.id === values.id;
-    //   });
-    //   //console.log("obs before id: ", obs[0]);
-    //   obs[0].obsData = values;
-    //   //console.log("obs after id: ", obs[0]);
-
-    //   setIsEditMode(false);
-    //   setIsAddMode(false);
-    //   //.obsData = values;
-    // } else {
     let newID = Math.random().toString();
 
     setObservations((currentObservation) => [
@@ -134,16 +108,13 @@ const ProfileScreen = (props) => {
     let newObs = { id: newID, obsData: values };
     updateSavedObs(newObs);
 
-    console.log("obsParams after: ", obsParams);
+    //console.log("obsParams after: ", obsParams);
 
     setIsAddMode(false);
-
-    //setNewObs(true);
-    // }
   };
 
   const updateSavedObs = async (newOb) => {
-    console.log("in updateSavedObs");
+    //console.log("in updateSavedObs");
 
     //console.log("obs params in update: ", obsParams);
     let allObs = [...obsParams, newOb];
@@ -155,20 +126,20 @@ const ProfileScreen = (props) => {
       await AsyncStorage.mergeItem(
         user.id,
         JSON.stringify(obsToStore),
-        async () => {
-          await AsyncStorage.getItem(user.id, (err, result) => {
-            console.log("result of merge: ", result);
-          });
-        }
+        // async () => {
+        //   await AsyncStorage.getItem(user.id, (err, result) => {
+        //     console.log("result of merge: ", result);
+        //   });
+        // }
       );
     } catch (error) {
-      console.log("error merging: ", error);
+      //console.log("error merging: ", error);
     }
   };
 
   // check if new obs
   if (newObs) {
-    console.log("in if newobs");
+    //console.log("in if newobs");
     // call update func
     updateSavedObs();
     setNewObs(false);
@@ -205,14 +176,14 @@ const ProfileScreen = (props) => {
       await AsyncStorage.mergeItem(
         user.id,
         JSON.stringify(obsToStore),
-        async () => {
-          await AsyncStorage.getItem(user.id, (err, result) => {
-            console.log("in remove, result of merge: ", result);
-          });
-        }
+        // async () => {
+        //   await AsyncStorage.getItem(user.id, (err, result) => {
+        //     console.log("in remove, result of merge: ", result);
+        //   });
+        // }
       );
     } catch (error) {
-      console.log("error merging: ", error);
+      //console.log("error merging: ", error);
     }
 
     //updateSavedObs(filteredObs);
@@ -275,7 +246,7 @@ const ProfileScreen = (props) => {
               console.log("bad request: ", responseJSON.statuscode);
               alert("Could not complete request:\n\n" + responseJSON.msg);
             } else {
-              console.log("in reponse 200");
+              //console.log("in reponse 200");
               //setLoading(false);
               //setRespObj(responseJSON);
               removeObsHandler(observationID);
@@ -300,10 +271,6 @@ const ProfileScreen = (props) => {
     }
   };
 
-  // if (!isLoading) {
-  //   //console.log("responseJSON: ", respObj);
-  // }
-
   const submitEditObsHandler = (observationID) => {
     // get correct observation:
     let currentData = obsParams.filter((observation) => {
@@ -315,13 +282,6 @@ const ProfileScreen = (props) => {
     let datetime = currentData[0].obsData.time;
     let comments = currentData[0].obsData.comments;
 
-    // navigation.navigate("EditScreen", {
-    //   obsInfo: currentData[0],
-    //   userID: user.id,
-    //   allObs: obsParams,
-    // });
-
-    //console.log("in submitEditObs Handler");
     // call submit function
     // datetime, jarnum, observer
     putRequest(datetime, jarnum, observer, observationID, comments);
@@ -354,14 +314,14 @@ const ProfileScreen = (props) => {
   const [isInitialize, setInitialize] = useState(true);
 
   if (isInitialize) {
-    console.log("in initialize");
+    //console.log("in initialize");
 
     if (user.Observations) {
-      console.log("in if user.observations");
-      console.log("user obs: ", user.Observations);
+      // console.log("in if user.observations");
+      // console.log("user obs: ", user.Observations);
       setObservations(user.Observations);
     } else {
-      console.log("nothing in obs");
+      //console.log("nothing in obs");
     }
     setInitialize(false);
     // set obs from memory
@@ -371,90 +331,90 @@ const ProfileScreen = (props) => {
     setIsSettingsMode(false);
   };
 
-  const submitAllAsyc = (dateTime, jarNum, observer, comments, obsID) => {
-    return new Promise((resolve, reject) => {
-      fetch("http://epiic-fa01-dev.azurewebsites.net/api/dataobject", {
-        method: "PUT",
-        body: JSON.stringify({
-          siteid: "yerc",
-          t: dateTime,
-          dobtype: "WQSample",
-          name: "jar",
-          value: jarNum,
-          status: "new",
-          observer: observer,
-          //latlong: latLong,
-          comments: comments,
-        }),
-      })
-        .then((resp) => resp.json())
-        .then((data) => {
-          console.log("data: ", data);
-          if (data.statuscode !== 200) {
-            console.log("error submitting: ", data);
-            reject(new Error("something went wrong"));
-          } else {
-            // // remove from flat list
-            // let filteredObs = obsParams.filter(function (value, index, arr) {
-            //   return value.id !== obsID;
-            // });
+  // const submitAllAsyc = (dateTime, jarNum, observer, comments, obsID) => {
+  //   return new Promise((resolve, reject) => {
+  //     fetch("http://epiic-fa01-dev.azurewebsites.net/api/dataobject", {
+  //       method: "PUT",
+  //       body: JSON.stringify({
+  //         siteid: "yerc",
+  //         t: dateTime,
+  //         dobtype: "WQSample",
+  //         name: "jar",
+  //         value: jarNum,
+  //         status: "new",
+  //         observer: observer,
+  //         //latlong: latLong,
+  //         comments: comments,
+  //       }),
+  //     })
+  //       .then((resp) => resp.json())
+  //       .then((data) => {
+  //         console.log("data: ", data);
+  //         if (data.statuscode !== 200) {
+  //           console.log("error submitting: ", data);
+  //           reject(new Error("something went wrong"));
+  //         } else {
+  //           // // remove from flat list
+  //           // let filteredObs = obsParams.filter(function (value, index, arr) {
+  //           //   return value.id !== obsID;
+  //           // });
 
-            // // // console.log("obsparams before: ", obsParams);
-            // setObservations([...filteredObs]);
-            resolve(data);
+  //           // // // console.log("obsparams before: ", obsParams);
+  //           // setObservations([...filteredObs]);
+  //           resolve(data);
 
-            //console.log("filtered obs: ", filteredObs);
-            // console.log("obsParams after: ", obsParams);
-            //console.log("in setObservations");
+  //           //console.log("filtered obs: ", filteredObs);
+  //           // console.log("obsParams after: ", obsParams);
+  //           //console.log("in setObservations");
 
-            // let obsToStore = {
-            //   Observations: filteredObs,
-            // };
-            // await removeObsHandler(obsID);
-            //console.log(" no error submitting: ", data);
-          }
-        })
-        .catch((error) => alert("error: ", error));
-    });
-  };
+  //           // let obsToStore = {
+  //           //   Observations: filteredObs,
+  //           // };
+  //           // await removeObsHandler(obsID);
+  //           //console.log(" no error submitting: ", data);
+  //         }
+  //       })
+  //       .catch((error) => alert("error: ", error));
+  //   });
+  // };
 
-  const submitAllObservations = async () => {
-    //console.log('submit all');
-    // for each observation, call submit func
-    let toSubmit = obsParams;
-    toSubmit.forEach(async (el) => {
-      resp = submitAllAsyc(
-        el.obsData.time,
-        el.obsData.jarNum,
-        user.id,
-        el.obsData.comments,
-        el.id
-      );
-      await resp.then((data) => {
-        //updateSavedObs("");
+  // const submitAllObservations = async () => {
+  //   //console.log('submit all');
+  //   // for each observation, call submit func
+  //   let toSubmit = obsParams;
+  //   toSubmit.forEach(async (el) => {
+  //     resp = submitAllAsyc(
+  //       el.obsData.time,
+  //       el.obsData.jarNum,
+  //       user.id,
+  //       el.obsData.comments,
+  //       el.id
+  //     );
+  //     await resp.then((data) => {
+  //       //updateSavedObs("");
 
-        // remove from flat list
-        let filteredObs = obsParams.filter(function (value, index, arr) {
-          return value.id !== el.id;
-        });
+  //       // remove from flat list
+  //       let filteredObs = obsParams.filter(function (value, index, arr) {
+  //         return value.id !== el.id;
+  //       });
 
-        // // console.log("obsparams before: ", obsParams);
-        setObservations([...filteredObs]);
-        // if (data.statuscode != "200") {
-        //   console.log("error submitting: ", data);
-        // } else {
-        //   removeObsHandler(el.id);
-        // }
-        console.log("end of loop");
-      });
-    });
-  };
+  //       // // console.log("obsparams before: ", obsParams);
+  //       setObservations([...filteredObs]);
+  //       // if (data.statuscode != "200") {
+  //       //   console.log("error submitting: ", data);
+  //       // } else {
+  //       //   removeObsHandler(el.id);
+  //       // }
+  //       console.log("end of loop");
+  //     });
+  //   });
+  // };
 
-  const submitAllHandler = () => {
-    Alert.alert("Confirm", "This will submit all observations", [
-      { text: "Okay", style: "destructive", onPress: submitAllObservations },
-    ]);
-  };
+  // const submitAllHandler = () => {
+  //   Alert.alert("Confirm", "This will submit all observations", [
+  //     { text: "Okay", style: "destructive", onPress: submitAllObservations },
+  //   ]);
+  // };
 
   return (
     <View style={styles.screen}>
@@ -493,11 +453,11 @@ const ProfileScreen = (props) => {
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.btns, styles.sumbmitAll]}>
+      {/* <TouchableOpacity style={[styles.btns, styles.sumbmitAll]}>
         <View>
           <Button title="Submit All" onPress={submitAllHandler} />
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <GoalInput
         visible={isAddMode}
@@ -505,9 +465,6 @@ const ProfileScreen = (props) => {
         onCancel={cancelObsAddHandler}
         data={editData}
         id={user.id}
-        //onSubmit={submitObsHandler}
-        //location={currentLocation}
-        //onDelete={removeObsHandler}
       />
 
       {/* renderItem takes a function that will be called on each item of your data 
@@ -529,9 +486,6 @@ const ProfileScreen = (props) => {
           />
         )}
       />
-      {/* this view will be used to display saved goals */}
-      {/* map function takes a function that will execute on every element of an array */}
-      {/* {courseGoals.map(goal => () */}
     </View>
   );
 };
@@ -546,10 +500,10 @@ const styles = StyleSheet.create({
     //borderColor: "black",
     borderWidth: 1,
   },
-  sumbmitAll: {
-    // position: "absolute",
-    // bottom: 30,
-  },
+  // sumbmitAll: {
+  //   // position: "absolute",
+  //   // bottom: 30,
+  // },
   btns: {
     marginVertical: 10,
     width: "80%",
