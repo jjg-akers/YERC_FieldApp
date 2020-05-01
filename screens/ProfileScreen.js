@@ -194,7 +194,7 @@ const ProfileScreen = (props) => {
     // console.log("obsparams before: ", obsParams);
     setObservations([...filteredObs]);
 
-    console.log("filtered obs: ", filteredObs);
+    //console.log("filtered obs: ", filteredObs);
     // console.log("obsParams after: ", obsParams);
     //console.log("in setObservations");
 
@@ -389,7 +389,7 @@ const ProfileScreen = (props) => {
       })
         .then((resp) => resp.json())
         .then((data) => {
-          console.log("data: ", data);
+          //console.log("data: ", data);
           if (data.statuscode !== 200) {
             console.log("error submitting: ", data);
             reject(new Error("something went wrong"));
@@ -422,6 +422,7 @@ const ProfileScreen = (props) => {
     //console.log('submit all');
     // for each observation, call submit func
     let toSubmit = obsParams;
+    let obsToDel = [];
     toSubmit.forEach(async (el) => {
       resp = submitAllAsyc(
         el.obsData.time,
@@ -431,22 +432,32 @@ const ProfileScreen = (props) => {
         el.id
       );
       await resp.then((data) => {
+
+        obsToDel.push(el.id);
+
         //updateSavedObs("");
 
         // remove from flat list
-        let filteredObs = obsParams.filter(function (value, index, arr) {
-          return value.id !== el.id;
-        });
+        // if we've made it to here, it was a successful submission and we can delete the record
+        // let filteredObs = obsParams.filter(function (value, index, arr) {
+        //   return value.id !== el.id;
+        // });
 
         // // console.log("obsparams before: ", obsParams);
-        setObservations([...filteredObs]);
+        //setObservations([...filteredObs]);
         // if (data.statuscode != "200") {
         //   console.log("error submitting: ", data);
         // } else {
-        //   removeObsHandler(el.id);
+        removeObsHandler(el.id);
         // }
-        console.log("end of loop");
+        //console.log("end of loop");
       });
+    });
+
+    //delete the records
+    console.log("obstodel: ", obsToDel);
+    obsToDel.forEach((el) => {
+      console.log("el id: ", el);
     });
   };
 
