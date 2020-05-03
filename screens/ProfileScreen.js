@@ -31,6 +31,7 @@ import * as Permissions from "expo-permissions";
 import DrawerNavigator from "../navigation/DrawerNavigator";
 
 const ProfileScreen = (props) => {
+  console.log("start of profile");
   const { route, navigation } = props;
   //console.log('route: ', route);
   const { user } = route.params;
@@ -46,42 +47,30 @@ const ProfileScreen = (props) => {
           name="md-settings"
           style={{ paddingRight: 30 }}
         />
-        {/* <Button
-      onPress={() => alert("Button Pressed")}
-      title="Info"
-      color="#fff"
-    /> */}
       </TouchableOpacity>
     ),
   });
 
   // Function to completely remove user and data from phone (essetially reset app)
-  const deleteUserID = async (useID) => {
-    console.log("deleting user");
+  const deleteUserID = async () => {
+    console.log("deleting user: ", user.id);
     try {
-      await AsyncStorage.removeItem("jjg.akers@gmail.com");
+      await AsyncStorage.removeItem(user.id);
     } catch (error) {
       console.log("error deleting: ", error);
     }
 
     // after removing data from phone storage, navigate back to login screen
-    // navigation.navigate("Login", {
-    //   // obsInfo: currentData[0],
-    //   // userID: user.id,
-    //   // allObs: obsParams,
-    // });
     navigation.reset({
       index: 0,
       routes: [{ name: "Login" }],
     });
   };
 
-  //console.log('at profile screen: ', user);
-
-  const [currentLocation, setLocation] = useState(null);
+  //const [currentLocation, setLocation] = useState(null);
 
   // set up a container to manage our saved goals
-  const [courseGoals, setCourseGoals] = useState([]);
+  //const [courseGoals, setCourseGoals] = useState([]);
 
   // need to add a state to monitor is we are currently in add obs state
   const [isAddMode, setIsAddMode] = useState(false);
@@ -90,9 +79,9 @@ const ProfileScreen = (props) => {
   const [newObs, setNewObs] = useState(false);
 
   // observation container
-
   const [obsParams, setObservations] = useState([]);
 
+  // Handle opening settings modal
   const settingsHandler = () => {
     setIsSettingsMode(true);
   };
@@ -138,24 +127,14 @@ const ProfileScreen = (props) => {
   };
 
   // check if new obs
-  if (newObs) {
-    //console.log("in if newobs");
-    // call update func
-    updateSavedObs();
-    setNewObs(false);
-  }
+  // if (newObs) {
+  //   //console.log("in if newobs");
+  //   // call update func
+  //   updateSavedObs();
+  //   setNewObs(false);
+  // }
 
-  const addGoalHandler = (goalTitle) => {
-    //want to add our entered goal to a list of goals
-    //console.log(enteredGoal);
-
-    // to use flat list we need a complex item with a key and a value
-    setCourseGoals((currentGoals) => [
-      ...courseGoals,
-      { key: Math.random().toString(), value: goalTitle },
-    ]);
-  };
-
+  // remove an observation and resave memory
   const removeObsHandler = async (observationID) => {
     // remove from flat list
     let filteredObs = obsParams.filter(function (value, index, arr) {
@@ -189,9 +168,9 @@ const ProfileScreen = (props) => {
     //updateSavedObs(filteredObs);
   };
 
-  const [editData, setEditData] = useState("");
+  //const [editData, setEditData] = useState("");
 
-  const [isEditMode, setIsEditMode] = useState(false);
+  //const [isEditMode, setIsEditMode] = useState(false);
   // Handler to open an already saved observation
 
   const openEditObsHandler = (observationID) => {
@@ -210,8 +189,8 @@ const ProfileScreen = (props) => {
     });
   };
 
-  const [isLoading, setLoading] = useState(true);
-  const [respObj, setRespObj] = useState("");
+  // const [isLoading, setLoading] = useState(true);
+  // const [respObj, setRespObj] = useState("");
 
   // submit to db
   const putRequest = async (
@@ -285,10 +264,6 @@ const ProfileScreen = (props) => {
     // call submit function
     // datetime, jarnum, observer
     putRequest(datetime, jarnum, observer, observationID, comments);
-
-    // if (!isLoading) {
-    //   console.log(respObj);
-    // }
   };
 
   const addModeHandler = () => {
@@ -296,14 +271,14 @@ const ProfileScreen = (props) => {
     //getLocation();
   };
 
-  const cancelEditMode = () => {
-    setIsEditMode(false);
-  };
+  // const cancelEditMode = () => {
+  //   setIsEditMode(false);
+  // };
 
   // add function to cancel the add modal
   const cancelObsAddHandler = () => {
     setIsAddMode(false);
-    setEditData("");
+    //setEditData("");
   };
 
   const logoutHandler = () => {
@@ -314,15 +289,14 @@ const ProfileScreen = (props) => {
   const [isInitialize, setInitialize] = useState(true);
 
   if (isInitialize) {
-    //console.log("in initialize");
+    console.log("in initialize");
 
     if (user.Observations) {
       // console.log("in if user.observations");
       // console.log("user obs: ", user.Observations);
       setObservations(user.Observations);
-    } else {
-      //console.log("nothing in obs");
     }
+
     setInitialize(false);
     // set obs from memory
   }
@@ -463,7 +437,6 @@ const ProfileScreen = (props) => {
         visible={isAddMode}
         onAddGoal={addObservationHandler}
         onCancel={cancelObsAddHandler}
-        data={editData}
         id={user.id}
       />
 

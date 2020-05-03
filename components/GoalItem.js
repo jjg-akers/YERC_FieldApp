@@ -83,7 +83,7 @@ const RightActions = ({ progress, dragX, onPressDelete, id }) => {
 };
 
 const GoalItem = (props) => {
-  console.log("in goalitem");
+  //console.log("in goalitem");
   //const date = new Date().toString;
   return (
     // .bind sets a default argument

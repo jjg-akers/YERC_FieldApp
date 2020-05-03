@@ -223,7 +223,7 @@ const siteInfo = [
 ];
 
 const GoalInput = (props) => {
-  console.log("start of goal input");
+  //console.log("start of goal input");
   //const [isEditMode, setIsEditMode] = useState(false);
 
   let defaultVal = "";
@@ -280,15 +280,15 @@ const GoalInput = (props) => {
     props.onAddGoal(values);
   };
 
-  const [isCameraMode, setIsCameraMode] = useState(false);
+  // const [isCameraMode, setIsCameraMode] = useState(false);
 
-  const addCameraModeHandler = () => {
-    setIsCameraMode(true);
-  };
+  // const addCameraModeHandler = () => {
+  //   setIsCameraMode(true);
+  // };
 
-  const cancelCameraHandler = () => {
-    setIsCameraMode(false);
-  };
+  // const cancelCameraHandler = () => {
+  //   setIsCameraMode(false);
+  // };
 
   const cancelObservationHandler = () => {
     //console.log("in cancel");
@@ -300,14 +300,6 @@ const GoalInput = (props) => {
     defaultTemp = "";
     defaultVal = "";
   };
-
-  // const createButtonAlert = () => {
-  //   Alert.alert(
-  //     "Submission Successful!",
-  //     [{ text: "OK", onPress: () => cancelObservationHandler() }],
-  //     { cancelable: false }
-  //   );
-  // }
 
   const putRequest = async (dateTime, jarNum, observer) => {
     try {
@@ -333,34 +325,11 @@ const GoalInput = (props) => {
               console.log("bad request: ", responseJSON.statuscode);
               alert("Could not complete request:\n\n" + responseJSON.msg);
             } else {
-              //setLoading(false);
-              //setRespObj(responseJSON);
-              //removeObsHandler(observationID);
-              alert("Submission Successful!");
-              cancelObservationHandler();
-      
-
-              // Alert.alert(
-              //   "Submission Successful!",
-              //   [{ text: "OK", onPress: () => cancelObservationHandler() }],
-              //   { cancelable: false }
-              // );
-
-              //createButtonAlert();
-              
-              // alert(
-              //   "Submission Successful!",
-
-              //   {
-              //     text: "OK",
-              //     onPress: () => {
-              //       cancelObservationHandler();
-              //     },
-              //   },
-
-              //   { cancelable: false }
-              // );
-              //ancelObservationHandler();
+              Alert.alert(
+                "somethig",
+                "Submission Sucessful!",
+                [{ text: "Okay", style: "destructive", onPress: cancelObservationHandler}]
+              );
             }
           });
         } else {
@@ -374,22 +343,10 @@ const GoalInput = (props) => {
         }
       });
 
-      // let responseJson = await response.json();
       // return responseJson.msg;
     } catch (error) {
       console.error(error);
     }
-    //     .then((response) => response.json())
-    //     .then((responseJson) => {
-    //       setLoading(false);
-    //       setRespObj(responseJson);
-    //     });
-
-    //   // let responseJson = await response.json();
-    //   // return responseJson.msg;
-    // } catch (error) {
-    //   console.error(error);
-    // }
   };
 
   // POST REQUEST EXAMPLE
@@ -507,9 +464,7 @@ const GoalInput = (props) => {
         setSiteID(site.id);
         //console.log("sitename: ", site.id);
       }
-      // if (siteIDFound){
-      //   break;
-      // }
+
     });
     //array1.forEach(element => console.log(element));
   };
@@ -523,8 +478,6 @@ const GoalInput = (props) => {
   const [lang, setlang] = useState("js");
 
   return (
-    // <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS == "ios" ? "height" : "height"}>
-
     <Modal visible={props.visible} animationType="slide" transparent={true}>
       <TouchableWithoutFeedback
         onPress={() => {

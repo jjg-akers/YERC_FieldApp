@@ -121,17 +121,6 @@ export default function App() {
     //return userID;
   };
 
-  // let userID = getUserID();
-  // if (userID){
-  //   console.log("ID: ", userID);
-  // } else {
-  //   console.log("nothing");
-  // };
-
-  //login();
-  // pass the showprofile handler to the login screen as a prop so that it can be updated
-  //let content = <LoginScreen onConfirmedEmail={showProfileHandler} />;
-
   let content = <LoginScreen onConfirmedEmail={login} />;
 
   //check if content is initialized (truish)
@@ -145,32 +134,9 @@ export default function App() {
       />
     );
   } 
-  
-  // else {
-  //   console.log("in else login");
-  //   //login();
-  // }
 
   return (
     <MainStackNavigator />
-
-
-    //------------- old version
-  //   <View style={styles.screen}>
-
-  //     <Header title="YERC" />
-
-  //     {content}
-
-  //     {/* renderItem takes a function that will be called on each item of your data 
-  //     and returns a view*/}
-
-  //     {/* this view will be used to display saved goals */}
-  //     {/* map function takes a function that will execute on every element of an array */}
-  //     {/* {courseGoals.map(goal => () */}
-  //   </View>
-  // );
-  // ------------- END Old Ver
   );
 }
 
