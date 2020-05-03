@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Blank Template",
-    "slug": "rn-complete-guide",
+    "name": "YERC Field App",
+    "slug": "YERC-APP",
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": [
