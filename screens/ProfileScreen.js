@@ -198,7 +198,8 @@ const ProfileScreen = (props) => {
     jarNum,
     observer,
     observationID,
-    comments
+    comments,
+    obsSiteID
   ) => {
     try {
       let response = await fetch(
@@ -206,7 +207,8 @@ const ProfileScreen = (props) => {
         {
           method: "PUT",
           body: JSON.stringify({
-            siteid: "yerc",
+            //siteid: "yerc",
+            siteid: obsSiteID,
             t: dateTime,
             dobtype: "WQSample",
             name: "jar",
@@ -260,10 +262,11 @@ const ProfileScreen = (props) => {
     let jarnum = currentData[0].obsData.jarNum;
     let datetime = currentData[0].obsData.time;
     let comments = currentData[0].obsData.comments;
-
+    let obsSiteID = currentData[0].obsData.title;
+    //console.log(currentData[0]);
     // call submit function
     // datetime, jarnum, observer
-    putRequest(datetime, jarnum, observer, observationID, comments);
+    putRequest(datetime, jarnum, observer, observationID, comments, obsSiteID);
   };
 
   const addModeHandler = () => {

@@ -301,14 +301,15 @@ const GoalInput = (props) => {
     defaultVal = "";
   };
 
-  const putRequest = async (dateTime, jarNum, observer) => {
+  const putRequest = async (dateTime, jarNum, observer, obsSiteID) => {
     try {
       let response = await fetch(
         "http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
         {
           method: "PUT",
           body: JSON.stringify({
-            siteid: "yerc",
+            //siteid: "yerc",
+            siteid: obsSiteID,
             t: dateTime,
             dobtype: "WQSample",
             name: "jar",
@@ -394,8 +395,9 @@ const GoalInput = (props) => {
     let jarNum = enteredJar;
     let observer = props.id;
     let datetime = getTimeStamp();
+    let obsSiteID = siteID;
 
-    putRequest(datetime, jarNum, observer);
+    putRequest(datetime, jarNum, observer, obsSiteID);
     //cancelObservationHandler();
   };
 
