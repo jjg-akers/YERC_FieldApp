@@ -23,6 +23,8 @@ import { Camera } from "expo-camera";
 import CameraView from "../components/Camera";
 import Card from "../components/Card";
 import Colors from "../constants/colors";
+import Configs from "../constants/Config";
+
 import Input from "../components/Input";
 import Settings from "../components/Settings";
 import ListItem, { Separator } from "../components/ListItem";
@@ -31,7 +33,7 @@ import * as Permissions from "expo-permissions";
 import DrawerNavigator from "../navigation/DrawerNavigator";
 
 const ProfileScreen = (props) => {
-  console.log("start of profile");
+  //console.log("start of profile");
   const { route, navigation } = props;
   //console.log('route: ', route);
   const { user } = route.params;
@@ -144,7 +146,7 @@ const ProfileScreen = (props) => {
     // console.log("obsparams before: ", obsParams);
     setObservations([...filteredObs]);
 
-    console.log("filtered obs: ", filteredObs);
+    //console.log("filtered obs: ", filteredObs);
     // console.log("obsParams after: ", obsParams);
     //console.log("in setObservations");
 
@@ -203,7 +205,8 @@ const ProfileScreen = (props) => {
   ) => {
     try {
       let response = await fetch(
-        "http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
+        //"http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
+        Configs.URL,
         {
           method: "PUT",
           body: JSON.stringify({

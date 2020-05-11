@@ -15,6 +15,8 @@ import {
 } from "react-native";
 import CameraView from "./Camera";
 import Constants from "expo-constants";
+import Configs from "../constants/Config";
+
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 
@@ -304,7 +306,8 @@ const GoalInput = (props) => {
   const putRequest = async (dateTime, jarNum, observer, obsSiteID) => {
     try {
       let response = await fetch(
-        "http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
+        //"http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
+        Configs.URL,
         {
           method: "PUT",
           body: JSON.stringify({
