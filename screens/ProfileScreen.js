@@ -116,7 +116,7 @@ const ProfileScreen = (props) => {
     try {
       await AsyncStorage.mergeItem(
         user.id,
-        JSON.stringify(obsToStore),
+        JSON.stringify(obsToStore)
         // async () => {
         //   await AsyncStorage.getItem(user.id, (err, result) => {
         //     console.log("result of merge: ", result);
@@ -156,7 +156,7 @@ const ProfileScreen = (props) => {
     try {
       await AsyncStorage.mergeItem(
         user.id,
-        JSON.stringify(obsToStore),
+        JSON.stringify(obsToStore)
         // async () => {
         //   await AsyncStorage.getItem(user.id, (err, result) => {
         //     console.log("in remove, result of merge: ", result);
@@ -358,43 +358,156 @@ const ProfileScreen = (props) => {
   //   });
   // };
 
-  // const submitAllObservations = async () => {
-  //   //console.log('submit all');
-  //   // for each observation, call submit func
-  //   let toSubmit = obsParams;
-  //   toSubmit.forEach(async (el) => {
-  //     resp = submitAllAsyc(
-  //       el.obsData.time,
-  //       el.obsData.jarNum,
-  //       user.id,
-  //       el.obsData.comments,
-  //       el.id
-  //     );
-  //     await resp.then((data) => {
-  //       //updateSavedObs("");
+  const removeAllObs = async () => {
+    // remove from flat list
+    console.log("in remove all");
+    setObservations([]);
 
-  //       // remove from flat list
-  //       let filteredObs = obsParams.filter(function (value, index, arr) {
-  //         return value.id !== el.id;
-  //       });
+    //console.log("filtered obs: ", filteredObs);
+    // console.log("obsParams after: ", obsParams);
+    //console.log("in setObservations");
 
-  //       // // console.log("obsparams before: ", obsParams);
-  //       setObservations([...filteredObs]);
-  //       // if (data.statuscode != "200") {
-  //       //   console.log("error submitting: ", data);
-  //       // } else {
-  //       //   removeObsHandler(el.id);
-  //       // }
-  //       console.log("end of loop");
-  //     });
-  //   });
-  // };
+    let obsToStore = {
+      Observations: [],
+    };
+    try {
+      await AsyncStorage.mergeItem(
+        user.id,
+        JSON.stringify(obsToStore),
+        async () => {
+          await AsyncStorage.getItem(user.id, (err, result) => {
+            console.log("in remove, result of merge: ", result);
+          });
+        }
+      );
+    } catch (error) {
+      //console.log("error merging: ", error);
+    }
+  };
 
-  // const submitAllHandler = () => {
-  //   Alert.alert("Confirm", "This will submit all observations", [
-  //     { text: "Okay", style: "destructive", onPress: submitAllObservations },
-  //   ]);
-  // };
+  const putAllRequest = async (obsToSubmit) => {
+    console.log("in putAll");
+    try {
+      let response = await fetch(
+        //"http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
+        Configs.multiObsURL,
+        {
+          method: "PUT",
+          body: JSON.stringify(obsToSubmit),
+        }
+      ).then((response) => {
+        if (response.status <= 200 && response.status < 300) {
+          response.json().then((responseJSON) => {
+            if (responseJSON.statuscode !== 200) {
+              //console.log("bad response");
+              console.log("bad request: ", responseJSON.statuscode);
+              alert("Could not complete request:\n\n" + responseJSON.msg);
+            } else {
+              console.log("submission successful in reponse 200");
+
+              //remove all saved obs
+              removeAllObs();
+
+              //setLoading(false);
+              //setRespObj(responseJSON);
+              //removeObsHandler(observationID);
+              //alert("Submission Successful!");
+            }
+          });
+        } else {
+          //console.log("bad response");
+          console.log(
+            "ERROR, response status: ",
+            response.status,
+            response.headers
+          );
+          alert("Unable to submit!\nPlease try again later");
+        }
+      });
+
+      // let responseJson = await response.json();
+      // return responseJson.msg;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const submitAllObservations = async () => {
+    //build up object
+    let toSubmit = [];
+    //console.log("obs params: ", toSubmit);
+
+    //  //siteid: "yerc",
+    //  siteid: obsSiteID,
+    //  t: dateTime,
+    //  dobtype: "WQSample",
+    //  name: "jar",
+    //  value: jarNum,
+    //  status: "new",
+    //  observer: observer,
+    //  //latlong: latLong,
+    //  comments: comments,
+
+    obsParams.forEach((el) => {
+      let currentObs = {
+        siteid: el.obsData.title,
+        t: el.obsData.time,
+        dobtype: "WQSample",
+        name: "jar",
+        value: el.obsData.jarNum,
+        status: "new",
+        observer: user.id,
+        comments: el.obsData.comments,
+      };
+
+      //console.log("currentobs: ", currentObs);
+      toSubmit.push(currentObs);
+    });
+
+    //console.log("obs params: ", toSubmit);
+
+    // call putall func
+    putAllRequest(toSubmit);
+    // toSubmit.forEach(async (el) => {
+    //   resp = submitAllAsyc(
+    //     el.obsData.time,
+    //     el.obsData.jarNum,
+    //     user.id,
+    //     el.obsData.comments,
+    //     el.id
+    //   );
+    //   await resp.then((data) => {
+    //     //updateSavedObs("");
+
+    //     // remove from flat list
+    //     let filteredObs = obsParams.filter(function (value, index, arr) {
+    //       return value.id !== el.id;
+    //     });
+
+    //     // // console.log("obsparams before: ", obsParams);
+    //     setObservations([...filteredObs]);
+    //     // if (data.statuscode != "200") {
+    //     //   console.log("error submitting: ", data);
+    //     // } else {
+    //     //   removeObsHandler(el.id);
+    //     // }
+    //     console.log("end of loop");
+    //   });
+    // });
+  };
+
+  const submitAllHandler = () => {
+    Alert.alert("Confirm", "This will submit all observations", [
+      { text: "Okay", style: "destructive", onPress: submitAllObservations },
+      {
+        text: "Cancel",
+        style: "cancel",
+        onPress: () => {
+          return;
+        },
+      },
+    ]);
+  };
 
   return (
     <View style={styles.screen}>
@@ -433,11 +546,11 @@ const ProfileScreen = (props) => {
         </View>
       </TouchableOpacity>
 
-      {/* <TouchableOpacity style={[styles.btns, styles.sumbmitAll]}>
+      <TouchableOpacity style={[styles.btns, styles.sumbmitAll]}>
         <View>
           <Button title="Submit All" onPress={submitAllHandler} />
         </View>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
 
       <GoalInput
         visible={isAddMode}
