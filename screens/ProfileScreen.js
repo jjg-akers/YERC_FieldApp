@@ -360,7 +360,7 @@ const ProfileScreen = (props) => {
 
   const removeAllObs = async () => {
     // remove from flat list
-    console.log("in remove all");
+    //console.log("in remove all");
     setObservations([]);
 
     //console.log("filtered obs: ", filteredObs);
@@ -373,12 +373,13 @@ const ProfileScreen = (props) => {
     try {
       await AsyncStorage.mergeItem(
         user.id,
-        JSON.stringify(obsToStore),
-        async () => {
-          await AsyncStorage.getItem(user.id, (err, result) => {
-            console.log("in remove, result of merge: ", result);
-          });
-        }
+        JSON.stringify(obsToStore)
+        // ,
+        // async () => {
+        //   await AsyncStorage.getItem(user.id, (err, result) => {
+        //     console.log("in remove, result of merge: ", result);
+        //   });
+        // }
       );
     } catch (error) {
       //console.log("error merging: ", error);
@@ -386,7 +387,7 @@ const ProfileScreen = (props) => {
   };
 
   const putAllRequest = async (obsToSubmit) => {
-    console.log("in putAll");
+    //console.log("in putAll");
     try {
       let response = await fetch(
         //"http://epiic-fa01-dev.azurewebsites.net/api/dataobject",
@@ -403,15 +404,10 @@ const ProfileScreen = (props) => {
               console.log("bad request: ", responseJSON.statuscode);
               alert("Could not complete request:\n\n" + responseJSON.msg);
             } else {
-              console.log("submission successful in reponse 200");
+              //console.log("submission successful in reponse 200");
 
               //remove all saved obs
               removeAllObs();
-
-              //setLoading(false);
-              //setRespObj(responseJSON);
-              //removeObsHandler(observationID);
-              //alert("Submission Successful!");
             }
           });
         } else {
@@ -435,18 +431,6 @@ const ProfileScreen = (props) => {
   const submitAllObservations = async () => {
     //build up object
     let toSubmit = [];
-    //console.log("obs params: ", toSubmit);
-
-    //  //siteid: "yerc",
-    //  siteid: obsSiteID,
-    //  t: dateTime,
-    //  dobtype: "WQSample",
-    //  name: "jar",
-    //  value: jarNum,
-    //  status: "new",
-    //  observer: observer,
-    //  //latlong: latLong,
-    //  comments: comments,
 
     obsParams.forEach((el) => {
       let currentObs = {
@@ -468,35 +452,15 @@ const ProfileScreen = (props) => {
 
     // call putall func
     putAllRequest(toSubmit);
-    // toSubmit.forEach(async (el) => {
-    //   resp = submitAllAsyc(
-    //     el.obsData.time,
-    //     el.obsData.jarNum,
-    //     user.id,
-    //     el.obsData.comments,
-    //     el.id
-    //   );
-    //   await resp.then((data) => {
-    //     //updateSavedObs("");
-
-    //     // remove from flat list
-    //     let filteredObs = obsParams.filter(function (value, index, arr) {
-    //       return value.id !== el.id;
-    //     });
-
-    //     // // console.log("obsparams before: ", obsParams);
-    //     setObservations([...filteredObs]);
-    //     // if (data.statuscode != "200") {
-    //     //   console.log("error submitting: ", data);
-    //     // } else {
-    //     //   removeObsHandler(el.id);
-    //     // }
-    //     console.log("end of loop");
-    //   });
-    // });
   };
 
   const submitAllHandler = () => {
+    //console.log("obsparams: ", obsParams);
+    if (!(obsParams && obsParams.length)){
+      //console.log('empty list');
+      alert("No observations to submit");
+      return;
+    }
     Alert.alert("Confirm", "This will submit all observations", [
       { text: "Okay", style: "destructive", onPress: submitAllObservations },
       {
@@ -541,8 +505,6 @@ const ProfileScreen = (props) => {
       <TouchableOpacity style={styles.btns}>
         <View>
           <Button title="Add Observation" onPress={addModeHandler} />
-          {/* // now onAddGoal will be recieved as a prop inside GoalInput */}
-          {/* <GoalInput onAddGoal={addGoalHandler} /> */}
         </View>
       </TouchableOpacity>
 
